@@ -14,11 +14,11 @@ const Line = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 export default function Home() {
   return (
     <div className="flex items-center justify-center">
-      <link rel="preload" as="image" href="/images/intro_banner.avif" />
       <main className="flex w-full flex-col items-center">
         <ScrollTopButton />
         {/* Intro Section */}
         <FixedBanner
+          isHero
           title="This is our story"
           subtitle="Where potato meets olenji..."
           bgImage="/images/intro_banner.avif"

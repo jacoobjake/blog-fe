@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 
 type FixedBannerProps = {
   title: string;
+  isHero?: boolean;
   subtitle?: string;
   bgImage: string;
   bgPos?: string;
@@ -13,26 +14,36 @@ type FixedBannerProps = {
 
 export default function FixedBanner({
   title,
+  isHero,
   subtitle,
   bgImage,
   bgPos,
   content,
 }: FixedBannerProps) {
   const bgRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const imageLoadedRef = useRef<boolean>(false);
 
   useEffect(() => {
+    if (!sectionRef.current) return;
     let ticking = false;
+    const topOffset =
+      sectionRef.current.getBoundingClientRect().top + window.scrollY;
+    const MAX_OFFSET = 600;
 
     const updateParallax = () => {
-      if (!bgRef.current) return;
+      if (!bgRef.current || !sectionRef.current) return;
 
       // Get banner position relative to viewport
-      const rect = bgRef.current.getBoundingClientRect();
-      const scrolled = -rect.top;
+      const scrolled = window.scrollY - topOffset;
 
       // Calculate parallax offset (slower movement than scroll)
       // 0.5 means it moves at 50% of the scroll speed
-      const parallaxOffset = scrolled * 0.5;
+      // Clamp the offset
+      const parallaxOffset = Math.max(
+        Math.min(scrolled * 0.5, MAX_OFFSET),
+        -MAX_OFFSET,
+      );
 
       // Apply the transform for smooth GPU-accelerated movement
       bgRef.current.style.transform = `translateY(${parallaxOffset}px)`;
@@ -58,7 +69,10 @@ export default function FixedBanner({
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden flex items-center justify-center text-white/90 font-sans">
+    <div
+      ref={sectionRef}
+      className="relative w-full h-screen overflow-hidden flex items-center justify-center text-white/90 font-sans"
+    >
       <div
         ref={bgRef}
         className="absolute inset-0"
@@ -73,9 +87,12 @@ export default function FixedBanner({
           quality={75}
           sizes="(max-width: 768px) 100vw, 80vw"
           className="object-cover"
-          loading="eager"
+          loading={isHero ? "eager" : "lazy"}
           style={{
             objectPosition: bgPos || "center",
+          }}
+          onLoad={() => {
+            imageLoadedRef.current = true;
           }}
         />
       </div>
