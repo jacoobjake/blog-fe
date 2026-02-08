@@ -81,6 +81,7 @@ export default function FixedBanner({
           quality={85}
           sizes="(max-width: 768px) 100vw, 80vw"
           className="object-cover"
+          loading="eager"
           style={{
             objectPosition: bgPos || "center",
           }}
