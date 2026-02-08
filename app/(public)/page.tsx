@@ -42,7 +42,7 @@ export default function Home() {
           title="Before We Knew"
           subtitle="Where the stars quietly aligned"
           bgImage="/images/chapter_1_banner.jpg"
-          bgPos="center 45%"
+          bgPos="73% 45%"
         />
 
         <SectionContent
@@ -133,7 +133,7 @@ export default function Home() {
           title="The Wedding"
           subtitle="A celebration of love and promise"
           bgImage="/images/chapter_5_banner.jpg"
-          bgPos="center 80%"
+          bgPos="46% 80%"
         />
         <SectionContent
           lines={[

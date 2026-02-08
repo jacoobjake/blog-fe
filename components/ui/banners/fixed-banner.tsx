@@ -18,9 +18,12 @@ export default function FixedBanner({
   content,
 }: FixedBannerProps) {
   const bgRef = useRef<HTMLDivElement>(null);
+  const scrollFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
+    let ticking = false;
+
+    const updateParallax = () => {
       if (!bgRef.current) return;
 
       // Get banner position relative to viewport
@@ -33,13 +36,27 @@ export default function FixedBanner({
 
       // Apply the transform for smooth GPU-accelerated movement
       bgRef.current.style.transform = `translateY(${parallaxOffset}px)`;
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        scrollFrameRef.current = requestAnimationFrame(updateParallax);
+        ticking = true;
+      }
     };
 
     // Use passive listener for better scroll performance
     window.addEventListener("scroll", handleScroll, { passive: true });
 
+    // Call once on mount to set initial state
+    updateParallax();
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      if (scrollFrameRef.current !== null) {
+        cancelAnimationFrame(scrollFrameRef.current);
+      }
     };
   }, []);
 
@@ -53,8 +70,9 @@ export default function FixedBanner({
           backgroundPosition: bgPos || "center",
           backgroundAttachment: "scroll",
           willChange: "transform",
-          transform: "translateZ(0)",
+          transform: "translate3d(0, 0, 0)",
           backfaceVisibility: "hidden",
+          perspective: 1000,
         }}
       ></div>
       <div className="absolute inset-0 bg-black/30"></div>
