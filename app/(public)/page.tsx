@@ -14,13 +14,14 @@ const Line = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 export default function Home() {
   return (
     <div className="flex items-center justify-center">
+      <link rel="preload" as="image" href="/images/intro_banner.avif" />
       <main className="flex w-full flex-col items-center">
         <ScrollTopButton />
         {/* Intro Section */}
         <FixedBanner
           title="This is our story"
           subtitle="Where potato meets olenji..."
-          bgImage="/images/intro_banner.jpg"
+          bgImage="/images/intro_banner.avif"
           content={
             <p className="animate-scroll-prompt py-2 text-2xl font-bold">
               Scroll to begin
@@ -41,7 +42,7 @@ export default function Home() {
         <FixedBanner
           title="Before We Knew"
           subtitle="Where the stars quietly aligned"
-          bgImage="/images/chapter_1_banner.jpg"
+          bgImage="/images/chapter_1_banner.avif"
           bgPos="73% 45%"
         />
 
@@ -66,7 +67,7 @@ export default function Home() {
         <FixedBanner
           title="When the world paused"
           subtitle="In uncertainty, we found each other"
-          bgImage="/images/chapter_2_banner.jpeg"
+          bgImage="/images/chapter_2_banner.avif"
           bgPos="30% 25%"
         />
         <SectionContent
@@ -88,7 +89,7 @@ export default function Home() {
         <FixedBanner
           title="Without Doubt"
           subtitle="A promise already written"
-          bgImage="/images/chapter_3_banner.jpg"
+          bgImage="/images/chapter_3_banner.avif"
         />
 
         <SectionContent
@@ -109,7 +110,7 @@ export default function Home() {
         <FixedBanner
           title="Mr. & Mrs."
           subtitle="Where vows became a lifetime"
-          bgImage="/images/chapter_4_banner.jpg"
+          bgImage="/images/chapter_4_banner.avif"
           bgPos="center 60%"
         />
 
@@ -132,7 +133,7 @@ export default function Home() {
         <FixedBanner
           title="The Wedding"
           subtitle="A celebration of love and promise"
-          bgImage="/images/chapter_5_banner.jpg"
+          bgImage="/images/chapter_5_banner.avif"
           bgPos="46% 80%"
         />
         <SectionContent
@@ -154,7 +155,7 @@ export default function Home() {
         <FixedBanner
           title="And Our Story Continues"
           subtitle="Now with Jimmy, and more to come"
-          bgImage="/images/chapter_6_banner.jpeg"
+          bgImage="/images/chapter_6_banner.avif"
           bgPos="center 35%"
         />
         <SectionContent
