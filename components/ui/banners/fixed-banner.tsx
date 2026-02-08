@@ -46,7 +46,7 @@ export default function FixedBanner({
       );
 
       // Apply the transform for smooth GPU-accelerated movement
-      bgRef.current.style.transform = `translateY(${parallaxOffset}px)`;
+      bgRef.current.style.transform = `translate3d(0, ${parallaxOffset}px, 0)`;
       ticking = false;
     };
 
