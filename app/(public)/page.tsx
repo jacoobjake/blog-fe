@@ -67,7 +67,7 @@ export default function Home() {
           title="When the world paused"
           subtitle="In uncertainty, we found each other"
           bgImage="/images/chapter_2_banner.jpeg"
-          bgPos="center 25%"
+          bgPos="30% 25%"
         />
         <SectionContent
           lines={[

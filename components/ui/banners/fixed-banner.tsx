@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 
 type FixedBannerProps = {
@@ -64,17 +65,27 @@ export default function FixedBanner({
     <div className="relative w-full h-screen overflow-hidden flex items-center justify-center text-white/90 font-sans">
       <div
         ref={bgRef}
-        className="absolute inset-0 bg-cover bg-no-repeat"
+        className="absolute inset-0"
         style={{
-          backgroundImage: `url(${bgImage})`,
-          backgroundPosition: bgPos || "center",
-          backgroundAttachment: "scroll",
           willChange: "transform",
           transform: "translate3d(0, 0, 0)",
           backfaceVisibility: "hidden",
           perspective: 1000,
         }}
-      ></div>
+      >
+        <Image
+          src={bgImage}
+          alt={title}
+          fill
+          priority
+          quality={85}
+          sizes="100vw"
+          className="object-cover"
+          style={{
+            objectPosition: bgPos || "center",
+          }}
+        />
+      </div>
       <div className="absolute inset-0 bg-black/30"></div>
       <div className="relative z-10 text-center">
         <h2 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
