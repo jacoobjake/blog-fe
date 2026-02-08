@@ -29,7 +29,7 @@ export default function FixedBanner({
     let ticking = false;
     const topOffset =
       sectionRef.current.getBoundingClientRect().top + window.scrollY;
-    const MAX_OFFSET = 600;
+    const MAX_OFFSET = 400;
 
     const updateParallax = () => {
       if (!bgRef.current || !sectionRef.current) return;
