@@ -1,36 +1,230 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# This is Our Story 🥔🍊
 
-## Getting Started
+A Next.js frontend for the blogging platform that tells the story of potato and olenji.
 
-First, run the development server:
+## Overview
+
+This is the frontend application for the "This is Our Story" blog. Currently, it displays a story divided into chapters with parallax banner effects. The backend API serves the content through GraphQL.
+
+## 🚀 Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) - React framework with App Router
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
+- **UI Components**: [HeroUI](https://heroui.com/) - Beautiful React components
+- **Icons**: [React Icons](https://react-icons.github.io/react-icons/) - Icon library
+- **Deployment**: [OpenNextJS + Cloudflare Workers](https://opennextjs.dev/) - Edge computing
+- **Language**: TypeScript - Type-safe JavaScript
+
+## 📁 Project Structure
+
+```
+blog-fe/
+├── app/                    # Next.js app directory
+│   └── (public)/          # Public routes group
+│       ├── page.tsx       # Home page with story chapters
+│       ├── blogs/         # Blog listing page
+│       └── layout.tsx     # Layout with navigation
+├── components/
+│   ├── nav/              # Navigation components
+│   │   └── public/
+│   │       ├── header.tsx      # Desktop navigation
+│   │       ├── mobile-menu.tsx # Mobile drawer menu
+│   │       └── footer.tsx      # Footer
+│   └── ui/               # Reusable UI components
+│       ├── banners/      # FixedBanner with parallax
+│       ├── contents/     # Content sections
+│       └── general/      # General utilities
+├── lib/
+│   ├── routes/           # Route definitions
+│   └── resolvers/        # Icon resolver
+├── hooks/                # Custom React hooks
+├── stores/               # Zustand stores
+└── public/               # Static assets
+    └── images/           # Chapter banner images
+```
+
+## ✨ Features
+
+- **Parallax Effect** - Full-screen banners with parallax scrolling
+- **Responsive** - Mobile and desktop optimized
+- **Dark/Light Theme** - Theme toggle support
+- **Mobile Menu** - Drawer navigation for mobile devices
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd blog-fe
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Create `.env.local` (if needed):
+
+```bash
+NEXT_PUBLIC_APP_NAME="This is Our Story"
+```
+
+### Development
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The page will auto-update as you edit files.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Build
 
-## Learn More
+Build for production:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Start the production server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm start
+```
 
-## Deploy on Vercel
+## 🚀 Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Local Preview
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+### Deploy to Cloudflare
+
+Deploy to Cloudflare Workers:
+
+```bash
+npm run deploy
+```
+
+This uses OpenNextJS to build and deploy the Next.js app to Cloudflare's edge network.
+
+## 📚 Key Components
+
+### FixedBanner
+
+Full-screen banner with parallax scrolling effect. Used for chapter introductions.
+
+```tsx
+<FixedBanner
+  title="Chapter Title"
+  subtitle="Subtitle"
+  bgImage="/images/banner.jpg"
+  bgPos="center 55%"
+/>
+```
+
+### SectionContent
+
+Text content section between banners for storytelling.
+
+```tsx
+<SectionContent lines={["Line of text", "Another line"]} />
+```
+
+### Navigation
+
+- `PublicHeader` - Desktop navigation bar
+- `MobileMenu` - Mobile menu drawer with smooth animations
+- Routes defined in `lib/routes/index.ts`
+
+## 🛣️ Roadmap
+
+### Phase 1: Current (MVP)
+
+- [x] Story chapters with parallax effects
+- [x] Responsive design
+- [x] Dark/light theme toggle
+- [x] Basic navigation
+
+### Phase 2: CMS Integration (Planned)
+
+- [ ] Blog content management admin panel
+- [ ] Dynamic blog post creation and editing
+- [ ] Blog post listing and filtering
+- [ ] Search functionality
+
+### Phase 3: Enhanced Features (Future)
+
+- [ ] Public user authentication and accounts
+- [ ] Bookmarking/favorites
+- [ ] Comment system
+- [ ] Social sharing
+- [ ] Analytics dashboard
+
+## 🎨 Customization
+
+### Theme
+
+Edit CSS variables in `app/globals.css` to customize colors:
+
+```css
+:root {
+  --accent: oklch(62.04% 0.195 140.75);
+  --background: oklch(97.02% 0.02 140.75);
+  /* ... more colors */
+}
+```
+
+### Routes
+
+Add new routes in `lib/routes/index.ts`:
+
+```ts
+export const NAV_ROUTES = [
+  { href: "/", label: "Home", icon: "IoHome" },
+  { href: "/blogs", label: "Blogs", icon: "LuBook" },
+];
+```
+
+### Icons
+
+Add new icon mappings in `lib/resolvers/icon-resolver.tsx`:
+
+```ts
+const iconMap = {
+  IconName: IconComponent,
+  // ...
+};
+```
+
+## 📖 Related Projects
+
+- **Backend API**: [blog-api](../blog-api) - Laravel GraphQL API serving content
+
+## 📝 License
+
+This project is private and proprietary.
+
+## 📞 Contact
+
+For questions or feedback, please reach out to the development team.
+
+---
+
+**Built with ❤️ for storytelling**

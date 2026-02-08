@@ -19,7 +19,6 @@ export default function FixedBanner({
   content,
 }: FixedBannerProps) {
   const bgRef = useRef<HTMLDivElement>(null);
-  const scrollFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     let ticking = false;
@@ -42,7 +41,7 @@ export default function FixedBanner({
 
     const handleScroll = () => {
       if (!ticking) {
-        scrollFrameRef.current = requestAnimationFrame(updateParallax);
+        requestAnimationFrame(updateParallax);
         ticking = true;
       }
     };
@@ -55,9 +54,6 @@ export default function FixedBanner({
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (scrollFrameRef.current !== null) {
-        cancelAnimationFrame(scrollFrameRef.current);
-      }
     };
   }, []);
 
@@ -77,8 +73,7 @@ export default function FixedBanner({
           src={bgImage}
           alt={title}
           fill
-          priority
-          quality={85}
+          quality={75}
           sizes="(max-width: 768px) 100vw, 80vw"
           className="object-cover"
           loading="eager"
