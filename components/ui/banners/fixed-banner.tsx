@@ -64,9 +64,6 @@ export default function FixedBanner({
         className="absolute inset-0"
         style={{
           willChange: "transform",
-          transform: "translate3d(0, 0, 0)",
-          backfaceVisibility: "hidden",
-          perspective: 1000,
         }}
       >
         <Image
