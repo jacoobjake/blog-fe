@@ -12,6 +12,8 @@ This is the frontend application for the "This is Our Story" blog. Currently, it
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
 - **UI Components**: [HeroUI](https://heroui.com/) - Beautiful React components
 - **Icons**: [React Icons](https://react-icons.github.io/react-icons/) - Icon library
+- **Animation**: [Motion (Framer Motion)](https://motion.dev/) - Smooth animations and parallax effects
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand) - Lightweight state management
 - **Deployment**: [OpenNextJS + Cloudflare Workers](https://opennextjs.dev/) - Edge computing
 - **Language**: TypeScript - Type-safe JavaScript
 
@@ -19,36 +21,42 @@ This is the frontend application for the "This is Our Story" blog. Currently, it
 
 ```
 blog-fe/
-├── app/                    # Next.js app directory
-│   └── (public)/          # Public routes group
-│       ├── page.tsx       # Home page with story chapters
-│       ├── blogs/         # Blog listing page
-│       └── layout.tsx     # Layout with navigation
+├── app/                      # Next.js app directory
+│   ├── (public)/            # Public routes group
+│   │   ├── page.tsx         # Home page with story chapters
+│   │   ├── blogs/           # Blog pages
+│   │   └── layout.tsx       # Public layout
+│   ├── globals.css          # Global styles & theme variables
+│   ├── layout.tsx           # Root layout
+│   └── not-found.tsx        # 404 page
 ├── components/
-│   ├── nav/              # Navigation components
-│   │   └── public/
-│   │       ├── header.tsx      # Desktop navigation
-│   │       ├── mobile-menu.tsx # Mobile drawer menu
-│   │       └── footer.tsx      # Footer
-│   └── ui/               # Reusable UI components
-│       ├── banners/      # FixedBanner with parallax
-│       ├── contents/     # Content sections
-│       └── general/      # General utilities
+│   ├── nav/                 # Navigation components
+│   │   └── public/          # Public navigation (header, footer, mobile menu)
+│   └── ui/                  # Reusable UI components organized by concerns
+│       ├── banners/         # Banner components (parallax, fixed)
+│       ├── contents/        # Content sections (animated-line, section-content)
+│       └── general/         # General utilities (link, separator, scroll-top-button)
+├── hooks/                   # Custom React hooks
 ├── lib/
-│   ├── routes/           # Route definitions
-│   └── resolvers/        # Icon resolver
-├── hooks/                # Custom React hooks
-├── stores/               # Zustand stores
-└── public/               # Static assets
-    └── images/           # Chapter banner images
+│   ├── routes/              # Route definitions
+│   └── resolvers/           # Icon resolver
+├── stores/                  # Zustand state management
+├── providers/               # React context providers (theme, etc.)
+├── public/                  # Static assets
+│   └── images/              # Chapter banner images
+├── styles/                  # Exported style constants
+└── config files             # (tsconfig, eslint, postcss, etc.)
 ```
 
 ## ✨ Features
 
-- **Parallax Effect** - Full-screen banners with parallax scrolling
-- **Responsive** - Mobile and desktop optimized
-- **Dark/Light Theme** - Theme toggle support
-- **Mobile Menu** - Drawer navigation for mobile devices
+- **Parallax Scrolling Effects** - Optimized full-screen and fixed banners with smooth parallax animations using Motion
+- **Responsive Design** - Mobile and desktop optimized with adaptive layouts
+- **Dark/Light Theme** - Theme toggle support with Zustand state management
+- **Mobile Navigation** - Smooth drawer menu for mobile devices
+- **Optimized Images** - Lazy-loaded and optimized banner images with Next.js Image component
+- **Scroll-to-Top Button** - Quick navigation to page top
+- **Custom Components** - Modular, reusable UI components (Link, Separator, etc.)
 
 ## 🛠️ Getting Started
 
@@ -126,16 +134,29 @@ This uses OpenNextJS to build and deploy the Next.js app to Cloudflare's edge ne
 
 ## 📚 Key Components
 
+### ParallaxBanner
+
+Optimized full-screen banner with parallax scrolling effect. Used for chapter introductions and hero sections.
+
+```tsx
+<ParallaxBanner
+  title="Chapter Title"
+  subtitle="Subtitle"
+  src="/images/banner.jpg"
+  bgPos="center 55%"
+  distance={300}
+/>
+```
+
 ### FixedBanner
 
-Full-screen banner with parallax scrolling effect. Used for chapter introductions.
+Fixed position banner component with smooth animations and optimized image loading.
 
 ```tsx
 <FixedBanner
   title="Chapter Title"
   subtitle="Subtitle"
-  bgImage="/images/banner.jpg"
-  bgPos="center 55%"
+  src="/images/banner.jpg"
 />
 ```
 
@@ -147,6 +168,30 @@ Text content section between banners for storytelling.
 <SectionContent lines={["Line of text", "Another line"]} />
 ```
 
+### ScrollTopButton
+
+Floating button that smoothly scrolls the page back to the top.
+
+```tsx
+<ScrollTopButton />
+```
+
+### Separator
+
+Reusable separator/divider component for visual content separation.
+
+```tsx
+<Separator />
+```
+
+### Link
+
+Customized link component with consistent styling and behavior.
+
+```tsx
+<Link href="/blogs">View Blogs</Link>
+```
+
 ### Navigation
 
 - `PublicHeader` - Desktop navigation bar
@@ -155,12 +200,16 @@ Text content section between banners for storytelling.
 
 ## 🛣️ Roadmap
 
-### Phase 1: Current (MVP)
+### Phase 1: MVP (Current) ✅
 
 - [x] Story chapters with parallax effects
 - [x] Responsive design
 - [x] Dark/light theme toggle
 - [x] Basic navigation
+- [x] Mobile menu drawer
+- [x] Image optimization and lazy loading
+- [x] Parallax scrolling optimization
+- [x] Modular reusable components (Link, Separator, ScrollTopButton)
 
 ### Phase 2: CMS Integration (Planned)
 
@@ -176,6 +225,19 @@ Text content section between banners for storytelling.
 - [ ] Comment system
 - [ ] Social sharing
 - [ ] Analytics dashboard
+
+## 🚀 Recent Improvements
+
+**Latest Session Updates:**
+
+- Implemented `ParallaxBanner` component with optimized scroll detection and smooth transitions
+- Created reusable `Link` and `Separator` components for consistent UI
+- Added `ScrollTopButton` with smooth scroll-to-top functionality
+- Optimized parallax scroll performance using Motion library's `useScroll` and `useTransform` hooks
+- Enhanced banner image loading and optimization (lazy loading and eager load strategies)
+- Cleaned up component file naming conventions (kebab-case for new components)
+- Improved mobile menu and navigation responsiveness
+- Updated to latest Next.js 16 and React 19 with TypeScript support
 
 ## 🎨 Customization
 

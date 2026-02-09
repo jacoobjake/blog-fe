@@ -1,7 +1,15 @@
-import FixedBanner from "@/components/ui/banners/fixed-banner";
+import ParallaxBanner from "@/components/ui/banners/parallax-banner";
 import SectionContent from "@/components/ui/contents/section-content";
-import ScrollTopButton from "@/components/ui/general/ScrollTopButton";
-import { Link, Separator } from "@heroui/react";
+import ScrollTopButton from "@/components/ui/general/scroll-top-button";
+import IntroBanner from "@/public/images/intro_banner.avif";
+import Chapter1Banner from "@/public/images/chapter_1_banner.avif";
+import Chapter2Banner from "@/public/images/chapter_2_banner.avif";
+import Chapter3Banner from "@/public/images/chapter_3_banner.avif";
+import Chapter4Banner from "@/public/images/chapter_4_banner.avif";
+import Chapter5Banner from "@/public/images/chapter_5_banner.avif";
+import Chapter6Banner from "@/public/images/chapter_6_banner.avif";
+import Separator from "@/components/ui/general/separator";
+import Link from "@/components/ui/general/link";
 
 const ColoredText = {
   potato: <span className="text-[#E6D3A3]">potato</span>,
@@ -17,11 +25,11 @@ export default function Home() {
       <main className="flex w-full flex-col items-center">
         <ScrollTopButton />
         {/* Intro Section */}
-        <FixedBanner
+        <ParallaxBanner
           isHero
           title="This is our story"
           subtitle="Where potato meets olenji..."
-          bgImage="/images/intro_banner.avif"
+          src={IntroBanner}
           content={
             <p className="animate-scroll-prompt py-2 text-2xl font-bold">
               Scroll to begin
@@ -39,11 +47,11 @@ export default function Home() {
         />
 
         {/* Chapter 1 */}
-        <FixedBanner
+        <ParallaxBanner
           title="Before We Knew"
           subtitle="Where the stars quietly aligned"
-          bgImage="/images/chapter_1_banner.avif"
-          bgPos="73% 45%"
+          src={Chapter1Banner}
+          bgPos="73% 60%"
         />
 
         <SectionContent
@@ -64,10 +72,10 @@ export default function Home() {
         />
 
         {/* Chapter 2 */}
-        <FixedBanner
+        <ParallaxBanner
           title="When the world paused"
           subtitle="In uncertainty, we found each other"
-          bgImage="/images/chapter_2_banner.avif"
+          src={Chapter2Banner}
           bgPos="30% 25%"
         />
         <SectionContent
@@ -86,10 +94,10 @@ export default function Home() {
         />
 
         {/* Chapter 3 */}
-        <FixedBanner
+        <ParallaxBanner
           title="Without Doubt"
           subtitle="A promise already written"
-          bgImage="/images/chapter_3_banner.avif"
+          src={Chapter3Banner}
         />
 
         <SectionContent
@@ -107,10 +115,10 @@ export default function Home() {
         />
 
         {/* Chapter 4 */}
-        <FixedBanner
+        <ParallaxBanner
           title="Mr. & Mrs."
           subtitle="Where vows became a lifetime"
-          bgImage="/images/chapter_4_banner.avif"
+          src={Chapter4Banner}
           bgPos="center 60%"
         />
 
@@ -130,10 +138,10 @@ export default function Home() {
           ]}
         />
         {/* Chapter 5 */}
-        <FixedBanner
+        <ParallaxBanner
           title="The Wedding"
           subtitle="A celebration of love and promise"
-          bgImage="/images/chapter_5_banner.avif"
+          src={Chapter5Banner}
           bgPos="46% 80%"
         />
         <SectionContent
@@ -152,10 +160,10 @@ export default function Home() {
         />
 
         {/* Chapter 6 */}
-        <FixedBanner
+        <ParallaxBanner
           title="And Our Story Continues"
           subtitle="Now with Jimmy, and more to come"
-          bgImage="/images/chapter_6_banner.avif"
+          src={Chapter6Banner}
           bgPos="center 35%"
         />
         <SectionContent

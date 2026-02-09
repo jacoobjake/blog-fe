@@ -1,4 +1,4 @@
-import { Link } from "@heroui/react";
+import Link from "@/components/ui/general/link";
 
 export default function GeneralNotFound() {
   return (
@@ -7,9 +7,7 @@ export default function GeneralNotFound() {
         404 - Ooops! The Resource You Are Looking For Is Not Found
       </h1>
       <p className="mt-2">The page you are looking for does not exist.</p>
-      <Link href="/" className={"text-accent-hover"}>
-        Go back to Home
-      </Link>
+      <Link href="/">Go back to Home</Link>
     </div>
   );
 }
