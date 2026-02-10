@@ -1,5 +1,6 @@
 "use client";
 
+import ThemeSwitch from "@/components/ui/theme/theme-switch";
 import { getIcon } from "@/lib/resolvers/icon-resolver";
 import { NAV_ROUTES } from "@/lib/routes";
 import {
@@ -56,8 +57,9 @@ export default function MobileMenu() {
             "data-exiting:zoom-out-100",
           )}
         >
-          <Modal.Dialog className="fixed rounded-r-none inset-y-0 right-0 w-3/4 min-h-screen bg-background space-y-4">
-            <Modal.Header className="flex flex-row justify-end w-full">
+          <Modal.Dialog className="fixed rounded-r-none inset-y-0 right-0 w-5/8 bg-background space-y-4 shadow-sm shadow-accent-foreground">
+            <Modal.Header className="flex flex-row justify-end w-full items-center gap-2">
+              <ThemeSwitch />
               <CloseButton
                 onClick={close}
                 className="bg-transparent transition-transform hover:scale-130 text-accent"
