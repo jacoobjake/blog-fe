@@ -13,25 +13,45 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-import "./globals.css";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_NAME,
   description: "Everything About Jake, Gan and Jimmy",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html
+      suppressHydrationWarning
       lang="en"
-      className={`light ${figtree.variable} ${playfair.variable}`}
-      data-theme="light"
+      className={`${figtree.variable} ${playfair.variable}`}
     >
-      <body>{children}</body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                  try {
+                      var theme = localStorage.getItem('theme-storage');
+                      if (!theme) {
+                          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+                              ? 'dark'
+                              : 'light';
+                      }
+                      if (theme === 'dark') {
+                          document.documentElement.classList.add('dark');
+                      }
+                  } catch (_) {}
+              })();`,
+          }}
+        />
+      </head>
+      <body className="bg-background">{children}</body>
     </html>
   );
 }

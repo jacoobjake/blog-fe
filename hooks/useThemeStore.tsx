@@ -1,5 +1,7 @@
-import { ThemeContext } from "@/providers/theme";
-import { type ThemeStore } from "@/stores";
+"use client";
+
+import { ThemeContext } from "@/providers/theme-provider";
+import { type ThemeStore } from "@/stores/types";
 import { useContext } from "react";
 import { useStore } from "zustand";
 

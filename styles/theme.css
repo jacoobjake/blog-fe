@@ -1,0 +1,153 @@
+/*
+ * HeroUI Theme Customization
+ * Add this to your global.css after importing @heroui/styles
+ * Only includes base variables from variables.css
+ * @see https://v3.heroui.com/docs/react/getting-started/theming
+ */
+
+:root,
+.light,
+.default,
+[data-theme="light"],
+[data-theme="default"] {
+  /* Theme Colors (Light Mode) */
+  --accent: oklch(55.33% 0.1467 129.46);
+  --accent-foreground: oklch(99.11% 0 0);
+  --background: oklch(97.02% 0.0148 129.46);
+  --border: oklch(90% 0.0148 129.46);
+  --danger: oklch(65.32% 0.2397 10.82);
+  --danger-foreground: oklch(99.11% 0 0);
+  --default: oklch(94% 0.0148 129.46);
+  --default-foreground: oklch(21.03% 0.0059 129.46);
+  --field-background: oklch(100% 0.0074 129.46);
+  --field-foreground: oklch(21.03% 0.0148 129.46);
+  --field-placeholder: oklch(55.17% 0.0296 129.46);
+  --focus: oklch(55.33% 0.1467 129.46);
+  --foreground: oklch(21.03% 0.0148 129.46);
+  --muted: oklch(55.17% 0.0296 129.46);
+  --overlay: oklch(100% 0.0044 129.46);
+  --overlay-foreground: oklch(21.03% 0.0148 129.46);
+  --scrollbar: oklch(87.1% 0.0148 129.46);
+  --segment: oklch(100% 0.0148 129.46);
+  --segment-foreground: oklch(21.03% 0.0148 129.46);
+  --separator: oklch(92% 0.0148 129.46);
+  --success: oklch(73.29% 0.1992 135.89);
+  --success-foreground: oklch(21.03% 0.0059 135.89);
+  --surface: oklch(100% 0.0074 129.46);
+  --surface-foreground: oklch(21.03% 0.0148 129.46);
+  --surface-secondary: oklch(95.24% 0.0118 129.46);
+  --surface-secondary-foreground: oklch(21.03% 0.0148 129.46);
+  --surface-tertiary: oklch(93.73% 0.0118 129.46);
+  --surface-tertiary-foreground: oklch(21.03% 0.0148 129.46);
+  --warning: oklch(78.19% 0.1632 57.41);
+  --warning-foreground: oklch(21.03% 0.0059 57.41);
+
+  /* Border Radius */
+  --radius: 0.5rem;
+  --field-radius: 0.75rem;
+
+  /* Font Family */
+  /* Make sure to load Figtree font in your app */
+  --font-sans: var(--font-figtree);
+  --font-serif: var(--font-playfair);
+}
+
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+  /* Theme Colors (Dark Mode) */
+  --accent: oklch(55.33% 0.1467 129.46);
+  --accent-foreground: oklch(99.11% 0 0);
+  --background: oklch(12% 0.0148 129.46);
+  --border: oklch(28% 0.0148 129.46);
+  --danger: oklch(59.4% 0.2025 9.71);
+  --danger-foreground: oklch(99.11% 0 0);
+  --default: oklch(27.4% 0.0148 129.46);
+  --default-foreground: oklch(99.11% 0 0);
+  --field-background: oklch(21.03% 0.0296 129.46);
+  --field-foreground: oklch(99.11% 0.0148 129.46);
+  --field-placeholder: oklch(70.5% 0.0296 129.46);
+  --focus: oklch(55.33% 0.1467 129.46);
+  --foreground: oklch(99.11% 0.0148 129.46);
+  --muted: oklch(70.5% 0.0296 129.46);
+  --overlay: oklch(21.03% 0.0296 129.46);
+  --overlay-foreground: oklch(99.11% 0.0148 129.46);
+  --scrollbar: oklch(70.5% 0.0148 129.46);
+  --segment: oklch(39.64% 0.0148 129.46);
+  --segment-foreground: oklch(99.11% 0.0148 129.46);
+  --separator: oklch(25% 0.0148 129.46);
+  --success: oklch(73.29% 0.1992 135.89);
+  --success-foreground: oklch(21.03% 0.0059 135.89);
+  --surface: oklch(21.03% 0.0296 129.46);
+  --surface-foreground: oklch(99.11% 0.0148 129.46);
+  --surface-secondary: oklch(25.7% 0.0222 129.46);
+  --surface-secondary-foreground: oklch(99.11% 0.0148 129.46);
+  --surface-tertiary: oklch(27.21% 0.0222 129.46);
+  --surface-tertiary-foreground: oklch(99.11% 0.0148 129.46);
+  --warning: oklch(82.03% 0.1429 61.42);
+  --warning-foreground: oklch(21.03% 0.0059 61.42);
+}
+
+@theme {
+  --animate-scroll-prompt: scrollPrompt 1.5s ease-in-out infinite;
+
+  @keyframes scrollPrompt {
+    0% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(10px);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 0.6;
+    }
+  }
+
+  --animate-scroll-fade: scrollFade 2s ease-out infinite;
+
+  @keyframes scrollFade {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    30% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  --animate-line-reveal: lineReveal 0.8s ease-out forwards;
+
+  @keyframes lineReveal {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+      filter: blur(4px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  --animate-content-fade-in: contentFadeIn 1s ease-out forwards;
+
+  @keyframes contentFadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}

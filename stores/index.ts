@@ -1,2 +1,2 @@
-export type * from "./types"
-export { createThemeStore } from "./themeStore";
+export { createThemeStore } from "./theme-store";
+export { createAuthStore } from "./auth-store";

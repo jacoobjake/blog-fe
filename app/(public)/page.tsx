@@ -1,6 +1,6 @@
-import ParallaxBanner from "@/components/ui/banners/parallax-banner";
-import SectionContent from "@/components/ui/contents/section-content";
-import ScrollTopButton from "@/components/ui/general/scroll-top-button";
+import { ParallaxBanner } from "@/components/ui/banners";
+import { SectionContent, Separator } from "@/components/ui/contents";
+import { ScrollTopButton, Link } from "@/components/ui/nav";
 import IntroBanner from "@/public/images/intro_banner.avif";
 import Chapter1Banner from "@/public/images/chapter_1_banner.avif";
 import Chapter2Banner from "@/public/images/chapter_2_banner.avif";
@@ -8,8 +8,6 @@ import Chapter3Banner from "@/public/images/chapter_3_banner.avif";
 import Chapter4Banner from "@/public/images/chapter_4_banner.avif";
 import Chapter5Banner from "@/public/images/chapter_5_banner.avif";
 import Chapter6Banner from "@/public/images/chapter_6_banner.avif";
-import Separator from "@/components/ui/general/separator";
-import Link from "@/components/ui/general/link";
 
 const ColoredText = {
   potato: <span className="text-[#E6D3A3]">potato</span>,

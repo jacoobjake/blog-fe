@@ -2,25 +2,29 @@
 
 import { useThemeStore } from "@/hooks";
 import { Button, cn } from "@heroui/react";
-import { useEffect } from "react";
 import { FiMoon, FiSun } from "react-icons/fi";
 
-export default function ThemeSwitch() {
+export default function ThemeSwitch({ className }: { className?: string }) {
   const { theme, setTheme } = useThemeStore((state) => state);
-  const handleThemeChange = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
 
-  useEffect(() => {
-    document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(theme);
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+  const handleThemeChange = async () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    if (newTheme === "dark") {
+      document.documentElement.classList.add(newTheme);
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
 
   return (
     <Button
       onClick={handleThemeChange}
-      className="relative focus:ring-0 bg-transparent text-accent transition-all duration-100 hover:bg-accent-soft-hover cursor-pointer"
+      className={cn(
+        "relative focus:ring-0 bg-transparent text-foreground transition-all duration-100 hover:bg-accent-soft-hover cursor-pointer",
+        className,
+      )}
     >
       <div
         className={cn(

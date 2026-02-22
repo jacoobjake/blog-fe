@@ -1,5 +1,4 @@
-import PublicHeader from "@/components/nav/public/header";
-import PublicFooter from "@/components/nav/public/footer";
+import { PublicHeader, PublicFooter } from "@/components/nav/public";
 
 export default function PublicLayout({
   children,

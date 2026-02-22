@@ -1,8 +1,8 @@
 "use client";
 
-import ThemeSwitch from "@/components/ui/theme/theme-switch";
+import { ThemeSwitch } from "@/components/ui/theme";
 import { getIcon } from "@/lib/resolvers/icon-resolver";
-import { NAV_ROUTES } from "@/lib/routes";
+import { NAV_ROUTES } from "@/constants/routes";
 import {
   Button,
   CloseButton,
@@ -12,12 +12,16 @@ import {
   Separator,
   useOverlayState,
 } from "@heroui/react";
-import { FiX } from "react-icons/fi";
-import { IoHome } from "react-icons/io5";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { usePathname } from "next/navigation";
+import { matchesRoutePattern } from "@/lib/utils/route";
 
 export default function MobileMenu() {
   const { isOpen, open, close, setOpen } = useOverlayState();
+  const pathname = usePathname();
+
+  const isActivePath = (pattern: string) =>
+    matchesRoutePattern(pathname, pattern);
 
   return (
     <div className="md:hidden">
@@ -25,7 +29,7 @@ export default function MobileMenu() {
         variant="ghost"
         isIconOnly
         className="text-accent rounded-md"
-        onClick={open}
+        onPress={open}
       >
         <RxHamburgerMenu />
       </Button>
@@ -57,7 +61,7 @@ export default function MobileMenu() {
             "data-exiting:zoom-out-100",
           )}
         >
-          <Modal.Dialog className="fixed rounded-r-none inset-y-0 right-0 w-5/8 bg-background space-y-4 shadow-sm shadow-accent-foreground">
+          <Modal.Dialog className="fixed rounded-r-none inset-y-0 right-0 w-5/8 bg-surface space-y-4 shadow-sm shadow-accent-foreground">
             <Modal.Header className="flex flex-row justify-end w-full items-center gap-2">
               <ThemeSwitch />
               <CloseButton
@@ -70,11 +74,22 @@ export default function MobileMenu() {
               {NAV_ROUTES.map((route) => (
                 <div key={route.href}>
                   <Link
-                    className="decoration-0 text-2xl text-accent transition-all hover:scale-105"
+                    className={cn(
+                      "decoration-0 text-2xl transition-all hover:scale-105 gap-2",
+                      {
+                        "text-accent": isActivePath(route.pattern),
+                        "text-foreground": !isActivePath(route.pattern),
+                      },
+                    )}
                     href={route.href}
                   >
                     {route.label}
-                    <Link.Icon className="size-10 ml-2 text-accent/70">
+                    <Link.Icon
+                      className={cn("size-10", {
+                        "text-accent/70": isActivePath(route.pattern),
+                        "text-foreground/70": !isActivePath(route.pattern),
+                      })}
+                    >
                       {getIcon(route.icon, 30)}
                     </Link.Icon>
                   </Link>
