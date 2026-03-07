@@ -4,7 +4,7 @@ import { createGraphqlClient } from "./graphql";
 import type { ApiFetcher } from "../core/types";
 import { createApiClient } from "../core/client";
 
-const ADMIN_BLOG_PATH = "api/admin/blog";
+const ADMIN_BLOG_PATH = "api/admin/blogs";
 
 type BlogListQueryVariables = {
   first: number;
@@ -66,9 +66,45 @@ export function createBlogApi(fetcher: ApiFetcher) {
   `;
 
   return {
-    // createBlog: async () => {},
-    // updateBlog: async () => {},
-    // deleteBlog: async () => {},
+    createBlog: async (data: {
+      title: string;
+      author: string;
+      json_content: {
+        type: string;
+        body: any;
+      };
+      is_published: boolean;
+      tags?: string[];
+    }) => {
+      const response = await http.post<{ data: { slug: string } }>(
+        `${ADMIN_BLOG_PATH}`,
+        data,
+      );
+      return response.data;
+    },
+    updateBlog: async (
+      slug: string,
+      data: {
+        title?: string;
+        author?: string;
+        json_content?: {
+          type: string;
+          body: any;
+        };
+        is_published?: boolean;
+        tags?: string[];
+      },
+    ) => {
+      const response = await http.put<{ data: { slug: string } }>(
+        `${ADMIN_BLOG_PATH}/${slug}`,
+        data,
+      );
+      return response.data;
+    },
+    deleteBlog: async (slug: string) => {
+      const response = await http.delete(`${ADMIN_BLOG_PATH}/${slug}`);
+      return response;
+    },
     listBlogs: async (
       variables: BlogListQueryVariables = { first: 10, page: 1 },
     ) => {
@@ -81,7 +117,15 @@ export function createBlogApi(fetcher: ApiFetcher) {
       const response = await gql.request<{ blog: Blog }>(blogDetailsQuery, {
         slug,
       });
-      return response.blog;
+
+      const blog = response.blog;
+
+      // Parse json_content if it's a string
+      if (blog?.json_content && typeof blog.json_content === "string") {
+        blog.json_content = JSON.parse(blog.json_content);
+      }
+
+      return blog;
     },
   };
 }

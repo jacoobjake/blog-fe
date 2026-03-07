@@ -1,0 +1,105 @@
+"use client";
+
+import {
+  Button,
+  Color,
+  ColorArea,
+  ColorField,
+  ColorPicker,
+  ColorSlider,
+  ColorSwatch,
+  ColorSwatchPicker,
+  Label,
+  parseColor,
+} from "@heroui/react";
+import { FaShuffle } from "react-icons/fa6";
+
+export function ColorPickerField({
+  color,
+  setColor,
+}: {
+  color: Color;
+  setColor: (color: Color) => void;
+}) {
+  const colorPresets = [
+    "#ef4444",
+    "#f97316",
+    "#eab308",
+    "#22c55e",
+    "#06b6d4",
+    "#3b82f6",
+    "#8b5cf6",
+    "#ec4899",
+    "#f43f5e",
+  ];
+
+  const shuffleColor = () => {
+    const randomHue = Math.floor(Math.random() * 360);
+    const randomSaturation = 50 + Math.floor(Math.random() * 50); // 50-100%
+    const randomLightness = 40 + Math.floor(Math.random() * 30); // 40-70%
+
+    setColor(
+      parseColor(
+        `hsl(${randomHue}, ${randomSaturation}%, ${randomLightness}%)`,
+      ),
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      <ColorPicker value={color} onChange={setColor}>
+        <ColorPicker.Trigger>
+          <ColorSwatch size="lg" />
+          <Label>{color?.toString("hex") ?? "Default"}</Label>
+        </ColorPicker.Trigger>
+        <ColorPicker.Popover className="gap-2">
+          <ColorSwatchPicker className="justify-center pt-2" size="xs">
+            {colorPresets.map((preset) => (
+              <ColorSwatchPicker.Item key={preset} color={preset}>
+                <ColorSwatchPicker.Swatch />
+              </ColorSwatchPicker.Item>
+            ))}
+          </ColorSwatchPicker>
+          <ColorArea
+            aria-label="Color area"
+            className="max-w-full"
+            colorSpace="hsb"
+            xChannel="saturation"
+            yChannel="brightness"
+          >
+            <ColorArea.Thumb />
+          </ColorArea>
+          <div className="flex items-center gap-2 px-1">
+            <ColorSlider
+              aria-label="Hue slider"
+              channel="hue"
+              className="flex-1"
+              colorSpace="hsb"
+            >
+              <ColorSlider.Track>
+                <ColorSlider.Thumb />
+              </ColorSlider.Track>
+            </ColorSlider>
+            <Button
+              isIconOnly
+              aria-label="Shuffle color"
+              size="sm"
+              variant="tertiary"
+              onPress={shuffleColor}
+            >
+              <FaShuffle size={4} />
+            </Button>
+          </div>
+          <ColorField aria-label="Color field">
+            <ColorField.Group variant="secondary">
+              <ColorField.Prefix>
+                <ColorSwatch size="xs" />
+              </ColorField.Prefix>
+              <ColorField.Input />
+            </ColorField.Group>
+          </ColorField>
+        </ColorPicker.Popover>
+      </ColorPicker>
+    </div>
+  );
+}

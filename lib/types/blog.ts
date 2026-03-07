@@ -1,7 +1,10 @@
 export type Blog = {
   slug: string;
   title: string;
-  json_content: Array<any> | null;
+  json_content: {
+    type: string;
+    body: string;
+  } | null;
   author: string;
   is_published: boolean;
   tags: { name: string }[];

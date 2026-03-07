@@ -133,7 +133,7 @@ export default function PageContainer({
   const { preAction, extraActions, content } = extractSlots(children);
 
   return (
-    <div className="h-full flex flex-col w-full space-y-4 p-4">
+    <div className="h-full flex flex-col w-full space-y-4 p-8">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           {preAction}

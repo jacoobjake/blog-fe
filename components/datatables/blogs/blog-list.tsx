@@ -1,28 +1,25 @@
 "use client";
 
 import { getBrowserApi } from "@/lib/apis";
-import { Blog, GraphqlResponseWithPaginatorInfo } from "@/lib/types";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Blog } from "@/lib/types";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   ColumnDef,
   getCoreRowModel,
   PaginationState,
   useReactTable,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-import BasicTableLayout from "../layouts/basic";
-import { Button, Chip } from "@heroui/react";
-import { FiEdit } from "react-icons/fi";
-import { useRouter } from "next/navigation";
-import Pagination from "../layouts/pagination";
-import RowCount from "../layouts/row-count";
+import { useEffect, useMemo, useState } from "react";
+import { Chip } from "@heroui/react";
+import OpenEditorButton from "@/components/editors/open-editor-btn";
+import HeroTableLayout from "../layouts/hero-table";
 
-type BlogListProps = {
-  initialData?: GraphqlResponseWithPaginatorInfo<Blog>;
-};
-
-export default function BlogList({ initialData }: BlogListProps) {
-  const router = useRouter();
+export default function BlogList() {
+  const queryClient = useQueryClient();
   const columns = useMemo<ColumnDef<Blog>[]>(
     () => [
       {
@@ -60,13 +57,7 @@ export default function BlogList({ initialData }: BlogListProps) {
           const row = info.row;
           return (
             <div className="flex items-center justify-end">
-              <Button
-                variant="ghost"
-                isIconOnly
-                onPress={() => router.push(`/admin/blogs/${row.original.slug}`)}
-              >
-                <FiEdit />
-              </Button>
+              <OpenEditorButton variant="ghost" slug={row.original.slug} />
             </div>
           );
         },
@@ -74,22 +65,12 @@ export default function BlogList({ initialData }: BlogListProps) {
     ],
     [],
   );
-  const [paginationState, setPaginationState] = useState<PaginationState>(
-    () => {
-      if (initialData) {
-        return {
-          pageIndex: initialData.paginatorInfo.currentPage - 1,
-          pageSize: initialData.paginatorInfo.perPage,
-        };
-      }
-      return {
-        pageIndex: 0,
-        pageSize: 10,
-      };
-    },
-  );
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const api = getBrowserApi();
-  const { data, ...query } = useQuery({
+  const query = useQuery({
     queryKey: ["blogs", paginationState],
     queryFn: async () => {
       const data = await api.blogs.listBlogs({
@@ -100,6 +81,8 @@ export default function BlogList({ initialData }: BlogListProps) {
     },
     placeholderData: keepPreviousData,
   });
+
+  const { data, isPlaceholderData } = query;
 
   const defaultData = useMemo(() => [], []);
 
@@ -116,13 +99,25 @@ export default function BlogList({ initialData }: BlogListProps) {
     debugTable: true,
   });
 
+  // Prefetch next page
+  useEffect(() => {
+    if (!isPlaceholderData && data?.paginatorInfo?.hasMorePages) {
+      queryClient.setQueryData(
+        [
+          "blogs",
+          {
+            pageIndex: paginationState.pageIndex + 1,
+            pageSize: paginationState.pageSize,
+          },
+        ],
+        data,
+      );
+    }
+  }, [isPlaceholderData, paginationState, data, queryClient]);
+
   return (
     <div className="w-full min-h-full flex flex-col gap-4">
-      <RowCount table={table} />
-      <Pagination table={table} />
-      <div className="grow">
-        <BasicTableLayout table={table} query={query} />
-      </div>
+      <HeroTableLayout table={table} query={query} />
     </div>
   );
 }
