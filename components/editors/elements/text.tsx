@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 import ContentEditable from "react-contenteditable";
 import DOMPurify from "dompurify";
-import { getHighlightedClassNames, SELECTED_CLASS_NAMES } from "../utils";
 
 export type TextElementProps = {
   text: string;
@@ -27,11 +26,11 @@ export const TextElement = ({
   const {
     actions: { setProp },
     connectors: { connect, drag },
-    hasSelectedNode,
-    hasDraggedNode,
+    selected,
+    dragged,
   } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-    hasDraggedNode: state.events.dragged,
+    selected: state.events.selected,
+    dragged: state.events.dragged,
   }));
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled,
@@ -40,9 +39,9 @@ export const TextElement = ({
   const [editable, setEditable] = useState(false);
 
   useEffect(() => {
-    if (!hasSelectedNode) setEditable(false);
-    else if (hasSelectedNode && enabled && !hasDraggedNode) setEditable(true);
-  }, [hasSelectedNode, enabled, hasDraggedNode]);
+    if (!selected) setEditable(false);
+    else if (selected && enabled && !dragged) setEditable(true);
+  }, [selected, enabled, dragged]);
 
   // Sanitize HTML to allow only safe formatting tags
   const sanitizeHtml = (html: string) => {
@@ -60,7 +59,6 @@ export const TextElement = ({
           connect(drag(ref));
         }
       }}
-      className={cn(getHighlightedClassNames(hasSelectedNode))}
     >
       <ContentEditable
         disabled={!editable}

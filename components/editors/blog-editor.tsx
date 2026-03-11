@@ -19,6 +19,8 @@ import { useRouter } from "next/navigation";
 import { getBrowserApi } from "@/lib/apis";
 import lz from "lz-string";
 import RightBar from "./toolbars/right-bar";
+import LeftBar from "./toolbars/left-bar";
+import { RenderNode } from "./render-node";
 
 type BlogEditorProps = {
   blog?: Blog;
@@ -114,6 +116,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
           SpacerElement,
         }}
         enabled={!isPreview}
+        onRender={RenderNode}
       >
         <EditorContent
           blog={blog}
@@ -174,8 +177,10 @@ function EditorContent({
       />
 
       <div className="flex flex-1 overflow-hidden">
+        {/* Left sidebar with toolbox */}
+        {!isPreview && <LeftBar />}
         {/* Main editor area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto page-container max-w-4xl mx-auto">
           <Frame data={getEditorData()}>
             <RootCanvas>
               <Element is={ContainerElement} padding={20} canvas>
@@ -185,7 +190,7 @@ function EditorContent({
           </Frame>
         </div>
 
-        {/* Right sidebar with toolbox and settings */}
+        {/* Right sidebar with layer and settings */}
         {!isPreview && <RightBar />}
       </div>
     </>

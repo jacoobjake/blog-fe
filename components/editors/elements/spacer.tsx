@@ -1,6 +1,5 @@
 import { useEditor, useNode, UserComponent } from "@craftjs/core";
 import { cn, Input, Label, Surface, TextField } from "@heroui/react";
-import { getHighlightedClassNames, SELECTED_CLASS_NAMES } from "../utils";
 
 export type SpacerElementProps = {
   height?: number;
@@ -35,7 +34,6 @@ export const SpacerElement: UserComponent<SpacerElementProps> = ({
       className={cn(
         showIndicators && "border border-dashed border-separator bg-surface/50",
         className,
-        getHighlightedClassNames(selected),
       )}
       style={{ height: `${height}px` }}
     >

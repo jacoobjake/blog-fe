@@ -6,7 +6,6 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "build:worker": "opennextjs-cloudflare build",
-    "build:editor-css": "tailwindcss -i ./styles/editor.css -o ./public/editor.css",
     "start": "next start",
     "lint": "eslint",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

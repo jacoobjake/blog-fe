@@ -1,9 +1,8 @@
 import { ContainerElement } from "./container";
 import { TextElement } from "./text";
 import { ButtonElement } from "./button";
-import { cn, SurfaceProps } from "@heroui/react";
+import { SurfaceProps } from "@heroui/react";
 import { Node, useNode, UserComponent, Element } from "@craftjs/core";
-import { getHighlightedClassNames, SELECTED_CLASS_NAMES } from "../utils";
 
 export type CardElementProps = {
   variant?: SurfaceProps["variant"];
@@ -23,16 +22,12 @@ export const CardContentElement: UserComponent<CardContentElementProps> = ({
 }) => {
   const {
     connectors: { connect },
-    hasSelectedNode,
-  } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-  }));
+  } = useNode();
   return (
     <div
       ref={(ref) => {
         if (ref) connect(ref);
       }}
-      className={cn({ [SELECTED_CLASS_NAMES]: hasSelectedNode })}
     >
       {children}
     </div>
@@ -56,16 +51,13 @@ export const CardFooterElement: UserComponent<CardFooterElementProps> = ({
 }: CardFooterElementProps) => {
   const {
     connectors: { connect },
-    hasSelectedNode,
-  } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-  }));
+  } = useNode();
+
   return (
     <div
       ref={(ref) => {
         if (ref) connect(ref);
       }}
-      className={cn(getHighlightedClassNames(hasSelectedNode))}
     >
       {children}
     </div>

@@ -1,5 +1,5 @@
 import { ColorPickerField } from "@/components/forms/fields/color-picker";
-import { useNode, UserComponent } from "@craftjs/core";
+import { useNode } from "@craftjs/core";
 import {
   cn,
   Input,
@@ -10,7 +10,6 @@ import {
   surfaceVariants,
   TextField,
 } from "@heroui/react";
-import { getHighlightedClassNames, SELECTED_CLASS_NAMES } from "../utils";
 
 export type ContainerElementProps = {
   children?: React.ReactNode;
@@ -29,10 +28,8 @@ export const ContainerElement = ({
 }: ContainerElementProps) => {
   const {
     connectors: { connect, drag },
-    hasSelectedNode,
-  } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-  }));
+  } = useNode();
+
   return (
     <div
       ref={(ref) => {
@@ -40,11 +37,7 @@ export const ContainerElement = ({
           connect(drag(ref));
         }
       }}
-      className={cn(
-        surfaceVariants({ variant }),
-        className,
-        getHighlightedClassNames(hasSelectedNode),
-      )}
+      className={cn(surfaceVariants({ variant }), className)}
       style={{ backgroundColor, padding }}
     >
       {children}

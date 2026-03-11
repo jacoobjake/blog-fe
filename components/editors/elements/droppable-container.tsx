@@ -1,5 +1,5 @@
 import { ColorPickerField } from "@/components/forms/fields/color-picker";
-import { Element, useEditor, useNode, UserComponent } from "@craftjs/core";
+import { Element, useNode, UserComponent } from "@craftjs/core";
 import {
   cn,
   Label,
@@ -10,7 +10,6 @@ import {
 } from "@heroui/react";
 import { TextElement } from "./text";
 import { ContainerElement } from "./container";
-import { getHighlightedClassNames, SELECTED_CLASS_NAMES } from "../utils";
 
 export type DroppableContainerElementProps = {
   backgroundColor?: string;
@@ -23,10 +22,7 @@ export const DroppableContainerElement: UserComponent<
 > = ({ backgroundColor, className, variant }) => {
   const {
     connectors: { connect, drag },
-    hasSelectedNode,
-  } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-  }));
+  } = useNode();
 
   return (
     <div
@@ -35,11 +31,7 @@ export const DroppableContainerElement: UserComponent<
           connect(drag(ref));
         }
       }}
-      className={cn(
-        surfaceVariants({ variant }),
-        className,
-        getHighlightedClassNames(hasSelectedNode),
-      )}
+      className={cn(surfaceVariants({ variant }), className)}
       style={{ backgroundColor }}
     >
       {/* Canvas area for dropping elements */}

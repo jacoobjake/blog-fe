@@ -6,11 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { BlogHeaderSchema } from "@/lib/schemas/blog";
 import { Surface, TextField, Label, Input, Checkbox, cn } from "@heroui/react";
-import {
-  getHighlightedClassNames,
-  HOVERED_CLASS_NAMES,
-  SELECTED_CLASS_NAMES,
-} from "../utils";
 
 export type BlogHeaderElementProps = {
   title: string;
@@ -29,20 +24,14 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
 }) => {
   const {
     connectors: { connect },
-    hasSelectedNode,
-  } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-  }));
+  } = useNode();
 
   return (
     <header
       ref={(ref) => {
         if (ref) connect(ref);
       }}
-      className={cn(
-        "mb-8 pb-6 border-b border-separator",
-        getHighlightedClassNames(hasSelectedNode),
-      )}
+      className={cn("mb-8 pb-6 border-b border-separator")}
     >
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-4xl font-bold">{title}</h1>

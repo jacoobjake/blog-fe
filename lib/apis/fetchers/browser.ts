@@ -49,7 +49,12 @@ async function ensureSanctumCsrfCookie(baseUrl: string): Promise<void> {
         Accept: "application/json",
         "X-Requested-With": "XMLHttpRequest",
       },
-    }).then(() => undefined);
+    })
+      .then(() => undefined)
+      .catch((err) => {
+        sanctumCookiePrefetch = null; // reset so we can retry later
+        throw err;
+      });
   }
 
   await sanctumCookiePrefetch;

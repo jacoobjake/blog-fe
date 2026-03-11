@@ -1,17 +1,15 @@
 "use client";
 
 import { Layers } from "@craftjs/layers";
-import { Button, Surface } from "@heroui/react";
-import { motion } from "motion/react";
-import { useState } from "react";
-import { FaChevronUp } from "react-icons/fa6";
+import { Surface } from "@heroui/react";
 
 export const LayersPanel = () => {
-  const [expanded, setExpanded] = useState(false);
   return (
-    <Surface>
+    <Surface className="flex flex-col h-full">
       <p className="text-lg font-bold">Layers</p>
-      <Layers />
+      <div className="grow overflow-auto">
+        <Layers expandRootOnLoad />
+      </div>
     </Surface>
   );
 };

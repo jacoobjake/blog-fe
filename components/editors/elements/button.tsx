@@ -10,7 +10,6 @@ import {
   Label,
   TextField,
 } from "@heroui/react";
-import { getHighlightedClassNames, SELECTED_CLASS_NAMES } from "../utils";
 
 export type ButtonElementProps = {
   label: string;
@@ -31,10 +30,7 @@ export const ButtonElement = ({
 }: ButtonElementProps) => {
   const {
     connectors: { connect, drag },
-    hasSelectedNode,
-  } = useNode((state) => ({
-    hasSelectedNode: state.events.selected,
-  }));
+  } = useNode();
 
   return (
     <button
@@ -50,7 +46,6 @@ export const ButtonElement = ({
           variant,
         }),
         className,
-        getHighlightedClassNames(hasSelectedNode),
       )}
       style={{ color }}
     >
