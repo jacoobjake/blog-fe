@@ -1,5 +1,3 @@
-"use client";
-
 import { LoginForm } from "@/components/forms/auth";
 
 export default function AdminLoginPage() {

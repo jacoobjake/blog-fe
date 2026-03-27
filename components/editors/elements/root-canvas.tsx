@@ -2,7 +2,7 @@
 
 import { useNode, Element, UserComponent } from "@craftjs/core";
 import { BlogHeaderElement } from "./blog-header";
-import { cn } from "@heroui/styles";
+import { useAuthStore } from "@/hooks/auth";
 
 export type RootCanvasProps = {
   children?: React.ReactNode;
@@ -12,6 +12,8 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ children }) => {
   const {
     connectors: { connect },
   } = useNode();
+
+  const user = useAuthStore((s) => s.user);
 
   return (
     <div
@@ -27,7 +29,7 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ children }) => {
           is={BlogHeaderElement}
           canvas={false}
           title="Untitled Blog Post"
-          author="Anonymous"
+          author={user?.name || "Anonymous"}
           is_published={false}
           tags={[]}
         />

@@ -1,10 +1,9 @@
-import { AdminHeader, AdminSideMenu } from "@/components/nav/admin";
 import { getServerApi } from "@/lib/apis/server";
 import { getErrorStatus } from "@/lib/utils/api-error";
 import AdminUiProvider from "@/providers/admin-ui-provider";
 import { redirect } from "next/navigation";
 
-export default async function AdminAuthenticatedLayout({
+export default async function EditorLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
