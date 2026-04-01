@@ -1,22 +1,19 @@
 "use client";
 
-import { Blog } from "@/lib/types";
-import { Editor, Frame, Element, useEditor } from "@craftjs/core";
+import { Blog, BlogContentType } from "@/lib/types";
+import { Editor, Frame, useEditor } from "@craftjs/core";
 import {
   TextElement,
   ContainerElement,
   ButtonElement,
-  CardElement,
   BlogHeaderElement,
   RootCanvas,
-  DroppableContainerElement,
   SpacerElement,
 } from "./elements";
 import { Topbar } from "./toolbars/topbar";
-import { CardContentElement, CardFooterElement } from "./elements/card";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getBrowserApi } from "@/lib/apis";
+import { blogApi } from "@/lib/apis";
 import lz from "lz-string";
 import RightBar from "./toolbars/right-bar";
 import LeftBar from "./toolbars/left-bar";
@@ -41,8 +38,6 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
   ) => {
     setIsSaving(true);
     try {
-      const api = getBrowserApi();
-
       // Get the serialized editor state
       const json = query.serialize();
 
@@ -62,11 +57,11 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
 
       if (blog?.slug) {
         // Update existing blog
-        await api.blogs.updateBlog(blog.slug, {
+        await blogApi.updateBlog(blog.slug, {
           title: title.trim(),
           author: author.trim(),
           json_content: {
-            type: "compressed_base64",
+            type: BlogContentType.CompressedBase64,
             body: compressed,
           },
           is_published: is_published,
@@ -74,11 +69,11 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
         });
       } else {
         // Create new blog
-        const response = await api.blogs.createBlog({
+        const response = await blogApi.createBlog({
           title: title.trim(),
           author: author.trim(),
           json_content: {
-            type: "compressed_base64",
+            type: BlogContentType.CompressedBase64,
             body: compressed,
           },
           is_published: is_published,
@@ -107,12 +102,8 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
           TextElement,
           ContainerElement,
           ButtonElement,
-          CardElement,
-          CardContentElement,
-          CardFooterElement,
           BlogHeaderElement,
           RootCanvas,
-          DroppableContainerElement,
           SpacerElement,
         }}
         enabled={!isPreview}
@@ -156,13 +147,10 @@ function EditorContent({
     const { type, body } = blog.json_content;
 
     switch (type) {
-      case "compressed_base64":
+      case BlogContentType.CompressedBase64:
         return lz.decompressFromBase64(body);
-      case "json":
-        // If it's already JSON string
-        return typeof body === "string" ? body : JSON.stringify(body);
       default:
-        // Try to use as-is
+        // Fallback: use as-is
         return typeof body === "string" ? body : JSON.stringify(body);
     }
   };
@@ -183,9 +171,9 @@ function EditorContent({
         <div className="flex-1 overflow-y-auto page-container max-w-4xl mx-auto">
           <Frame data={getEditorData()}>
             <RootCanvas>
-              <Element is={ContainerElement} padding={20} canvas>
+              {/* <Element is={ContainerElement} padding={20} canvas>
                 <TextElement text="Start writing your blog content here..." />
-              </Element>
+              </Element> */}
             </RootCanvas>
           </Frame>
         </div>

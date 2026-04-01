@@ -3,7 +3,6 @@ import type { User } from "@/lib/types";
 
 import { createGraphqlClient } from "./graphql";
 import type { ApiFetcher } from "../core/types";
-import { createApiClient } from "../core/client";
 
 const AUTH_PATH = "api/admin/auth";
 
@@ -13,7 +12,6 @@ const AUTH_PATH = "api/admin/auth";
  * Callers can pass either a browser fetcher or a server fetcher.
  */
 export function createAuthApi(fetcher: ApiFetcher) {
-  const http = createApiClient(fetcher);
   const gql = createGraphqlClient(fetcher);
 
   const meQuery = () => `
@@ -30,12 +28,16 @@ export function createAuthApi(fetcher: ApiFetcher) {
     meQuery,
 
     login: async (dto: LoginDto): Promise<boolean> => {
-      await http.post(`${AUTH_PATH}/session`, dto);
+      await fetcher({
+        path: `${AUTH_PATH}/session`,
+        method: "POST",
+        body: dto,
+      });
       return true;
     },
 
     logout: async (): Promise<void> => {
-      await http.post(`${AUTH_PATH}/invalidate`);
+      await fetcher({ path: `${AUTH_PATH}/invalidate`, method: "POST" });
     },
 
     me: async (): Promise<User> => {

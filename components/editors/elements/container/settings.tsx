@@ -1,49 +1,7 @@
 import { ColorPickerField } from "@/components/forms/fields/color-picker";
 import { useNode } from "@craftjs/core";
-import {
-  cn,
-  Input,
-  Label,
-  parseColor,
-  Surface,
-  SurfaceProps,
-  surfaceVariants,
-  TextField,
-} from "@heroui/react";
-
-export type ContainerElementProps = {
-  children?: React.ReactNode;
-  variant?: SurfaceProps["variant"];
-  backgroundColor?: string;
-  padding?: number;
-  className?: string;
-};
-
-export const ContainerElement = ({
-  children,
-  variant,
-  backgroundColor,
-  padding,
-  className,
-}: ContainerElementProps) => {
-  const {
-    connectors: { connect, drag },
-  } = useNode();
-
-  return (
-    <div
-      ref={(ref) => {
-        if (ref) {
-          connect(drag(ref));
-        }
-      }}
-      className={cn(surfaceVariants({ variant }), className)}
-      style={{ backgroundColor, padding }}
-    >
-      {children}
-    </div>
-  );
-};
+import { Input, Label, parseColor, Surface, TextField } from "@heroui/react";
+import type { ContainerElementProps } from "./types";
 
 export const ContainerSettings = () => {
   const {
@@ -82,15 +40,4 @@ export const ContainerSettings = () => {
       </TextField>
     </Surface>
   );
-};
-
-ContainerElement.craft = {
-  displayName: "Container",
-  props: {
-    padding: 0,
-    backgroundColor: "#ffffff", // White background
-  },
-  related: {
-    settings: ContainerSettings,
-  },
 };

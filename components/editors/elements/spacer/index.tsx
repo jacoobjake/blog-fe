@@ -1,10 +1,9 @@
 import { useEditor, useNode, UserComponent } from "@craftjs/core";
-import { cn, Input, Label, Surface, TextField } from "@heroui/react";
+import { cn } from "@heroui/react";
+import { SpacerSettings } from "./settings";
+import type { SpacerElementProps } from "./types";
 
-export type SpacerElementProps = {
-  height?: number;
-  className?: string;
-};
+export type { SpacerElementProps } from "./types";
 
 export const SpacerElement: UserComponent<SpacerElementProps> = ({
   height = 40,
@@ -43,32 +42,6 @@ export const SpacerElement: UserComponent<SpacerElementProps> = ({
         </div>
       )}
     </div>
-  );
-};
-
-export const SpacerSettings = () => {
-  const {
-    height,
-    actions: { setProp },
-  } = useNode((node) => ({
-    height: node.data.props.height,
-  }));
-
-  return (
-    <Surface className="space-y-4">
-      <TextField type="number">
-        <Label>Height (px)</Label>
-        <Input
-          type="number"
-          value={height}
-          onChange={(e) =>
-            setProp((props: SpacerElementProps) => {
-              props.height = Number(e.target.value);
-            })
-          }
-        />
-      </TextField>
-    </Surface>
   );
 };
 

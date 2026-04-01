@@ -2,7 +2,6 @@ import type { Blog, GraphqlResponseWithPaginatorInfo, User } from "@/lib/types";
 
 import { createGraphqlClient } from "./graphql";
 import type { ApiFetcher } from "../core/types";
-import { createApiClient } from "../core/client";
 
 const ADMIN_BLOG_PATH = "api/admin/blogs";
 
@@ -20,8 +19,13 @@ type BlogListQueryVariables = {
  * Callers can pass either a browser fetcher or a server fetcher.
  */
 export function createBlogApi(fetcher: ApiFetcher) {
-  const http = createApiClient(fetcher);
   const gql = createGraphqlClient(fetcher);
+
+  const post = <T>(path: string, body?: unknown) =>
+    fetcher<T>({ path, method: "POST", body });
+  const put = <T>(path: string, body?: unknown) =>
+    fetcher<T>({ path, method: "PUT", body });
+  const del = (path: string) => fetcher({ path, method: "DELETE" });
 
   const blogListQuery = `
     query Blogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String) {
@@ -76,7 +80,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
       is_published: boolean;
       tags?: string[];
     }) => {
-      const response = await http.post<{ data: { slug: string } }>(
+      const response = await post<{ data: { slug: string } }>(
         `${ADMIN_BLOG_PATH}`,
         data,
       );
@@ -95,14 +99,14 @@ export function createBlogApi(fetcher: ApiFetcher) {
         tags?: string[];
       },
     ) => {
-      const response = await http.put<{ data: { slug: string } }>(
+      const response = await put<{ data: { slug: string } }>(
         `${ADMIN_BLOG_PATH}/${slug}`,
         data,
       );
       return response.data;
     },
     deleteBlog: async (slug: string) => {
-      const response = await http.delete(`${ADMIN_BLOG_PATH}/${slug}`);
+      const response = await del(`${ADMIN_BLOG_PATH}/${slug}`);
       return response;
     },
     listBlogs: async (

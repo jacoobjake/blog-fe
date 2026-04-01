@@ -1,8 +1,10 @@
 "use client";
 
 import { useNode, Element, UserComponent } from "@craftjs/core";
-import { BlogHeaderElement } from "./blog-header";
+import { BlogHeaderElement } from "../blog-header";
 import { useAuthStore } from "@/hooks/auth";
+import { TextElement } from "../text";
+import { ContainerElement } from "../container";
 
 export type RootCanvasProps = {
   children?: React.ReactNode;
@@ -35,7 +37,10 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ children }) => {
         />
 
         {/* Content area */}
-        <div className="space-y-6">{children}</div>
+        <Element id="blog-content" is={ContainerElement} padding={20} canvas>
+          <TextElement text="Start writing your blog content here..." />
+          {children}
+        </Element>
       </div>
     </div>
   );

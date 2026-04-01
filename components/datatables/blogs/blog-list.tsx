@@ -1,6 +1,6 @@
 "use client";
 
-import { getBrowserApi } from "@/lib/apis";
+import { blogApi } from "@/lib/apis";
 import { Blog } from "@/lib/types";
 import {
   keepPreviousData,
@@ -69,11 +69,10 @@ export default function BlogList() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const api = getBrowserApi();
   const query = useQuery({
     queryKey: ["blogs", paginationState],
     queryFn: async () => {
-      const data = await api.blogs.listBlogs({
+      const data = await blogApi.listBlogs({
         first: paginationState.pageSize,
         page: paginationState.pageIndex + 1,
       });

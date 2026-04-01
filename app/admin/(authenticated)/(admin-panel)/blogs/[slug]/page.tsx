@@ -2,15 +2,15 @@ import OpenEditorButton from "@/components/editors/open-editor-btn";
 import { BlogDetailsForm } from "@/components/forms/blogs";
 import { BackButton } from "@/components/nav";
 import { AdminPage } from "@/components/ui/containers";
-import { getServerApi } from "@/lib/apis/server";
+import { getServerBlogApi } from "@/lib/apis/server";
 
 export default async function BlogDetailsPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const [{ slug }, api] = await Promise.all([params, getServerApi()]);
-  const blog = await api.blogs.getBlog(slug);
+  const [{ slug }, blogs] = await Promise.all([params, getServerBlogApi()]);
+  const blog = await blogs.getBlog(slug);
 
   return (
     <AdminPage title="Blog Details">

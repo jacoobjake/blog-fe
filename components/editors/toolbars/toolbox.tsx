@@ -1,12 +1,11 @@
 "use client";
 
-import { useEditor } from "@craftjs/core";
+import { Element, useEditor } from "@craftjs/core";
 import { Button, Surface, Tooltip } from "@heroui/react";
 import {
   ButtonElement,
   ContainerElement,
   TextElement,
-  DroppableContainerElement,
   SpacerElement,
 } from "../elements";
 import {
@@ -41,9 +40,9 @@ export const Toolbox = () => {
             if (ref) {
               connectors.create(
                 ref,
-                <ContainerElement padding={20}>
+                <Element canvas is={ContainerElement} padding={20}>
                   <TextElement text="Container content" />
-                </ContainerElement>,
+                </Element>,
               );
             }
           }}
@@ -52,18 +51,6 @@ export const Toolbox = () => {
           className="w-full justify-start"
         >
           Container
-        </Button>
-        <Button
-          ref={(ref) => {
-            if (ref) {
-              connectors.create(ref, <DroppableContainerElement />);
-            }
-          }}
-          variant="outline"
-          size="sm"
-          className="w-full justify-start"
-        >
-          Droppable Container
         </Button>
         <Button
           ref={(ref) => {
@@ -114,22 +101,13 @@ export const SlimToolbox = () => {
           if (ref) {
             connectors.create(
               ref,
-              <ContainerElement padding={20}>
+              <Element canvas is={ContainerElement} padding={20}>
                 <TextElement text="Container content" />
-              </ContainerElement>,
+              </Element>,
             );
           }
         }}
         tooltip={<p>Container</p>}
-      />
-      <SlimToolboxButton
-        icon={<LuBlocks />}
-        onCreate={(ref) => {
-          if (ref) {
-            connectors.create(ref, <DroppableContainerElement />);
-          }
-        }}
-        tooltip={<p>Droppable Container</p>}
       />
       <SlimToolboxButton
         icon={<MdOutlineTouchApp />}

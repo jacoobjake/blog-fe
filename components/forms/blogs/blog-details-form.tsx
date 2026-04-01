@@ -26,7 +26,7 @@ export default function BlogDetailsForm({ type, blog }: BlogDetailsFormProps) {
   } = useForm({
     defaultValues: {
       title: blog?.title || "",
-      json_content: blog?.json_content || [],
+      json_content: blog?.json_content ?? undefined,
       author: blog?.author || "",
       tags: blog?.tags.map((t) => t.name || "") || [],
     },

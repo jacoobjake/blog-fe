@@ -1,58 +1,8 @@
 import ButtonSizeField from "@/components/forms/fields/button-size-field";
 import ButtonVariantField from "@/components/forms/fields/button-variant-field";
 import { useNode } from "@craftjs/core";
-import {
-  ButtonProps,
-  buttonVariants,
-  cn,
-  Form,
-  Input,
-  Label,
-  TextField,
-} from "@heroui/react";
-
-export type ButtonElementProps = {
-  label: string;
-  onClick?: () => void;
-  size?: ButtonProps["size"];
-  variant?: ButtonProps["variant"];
-  color?: string;
-  className?: string;
-};
-
-export const ButtonElement = ({
-  label,
-  onClick,
-  size,
-  variant,
-  color,
-  className,
-}: ButtonElementProps) => {
-  const {
-    connectors: { connect, drag },
-  } = useNode();
-
-  return (
-    <button
-      ref={(ref) => {
-        if (ref) {
-          connect(drag(ref));
-        }
-      }}
-      onClick={onClick}
-      className={cn(
-        buttonVariants({
-          size,
-          variant,
-        }),
-        className,
-      )}
-      style={{ color }}
-    >
-      {label}
-    </button>
-  );
-};
+import { ButtonProps, Form, Input, Label, TextField } from "@heroui/react";
+import type { ButtonElementProps } from "./types";
 
 export const ButtonElementSettings = () => {
   const {
@@ -95,16 +45,4 @@ export const ButtonElementSettings = () => {
       />
     </Form>
   );
-};
-
-ButtonElement.craft = {
-  displayName: "Button",
-  props: {
-    label: "Button",
-    size: "md",
-    variant: "primary",
-  },
-  related: {
-    settings: ButtonElementSettings,
-  },
 };

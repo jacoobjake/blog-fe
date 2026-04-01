@@ -1,8 +1,9 @@
 import * as z from "zod";
+import { BlogContentType } from "@/lib/types";
 
 const JsonContentSchema = z.union([
   z.object({
-    type: z.literal("compressed_base64"),
+    type: z.literal(BlogContentType.CompressedBase64),
     body: z.string(),
   }),
 ]);

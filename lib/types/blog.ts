@@ -1,8 +1,12 @@
+export enum BlogContentType {
+  CompressedBase64 = "compressed_base64",
+}
+
 export type Blog = {
   slug: string;
   title: string;
   json_content: {
-    type: string;
+    type: BlogContentType;
     body: string;
   } | null;
   author: string;
