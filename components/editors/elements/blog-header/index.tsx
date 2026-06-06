@@ -1,6 +1,6 @@
 "use client";
 
-import { useNode, UserComponent } from "@craftjs/core";
+import { useEditor, useNode, UserComponent } from "@craftjs/core";
 import { cn } from "@heroui/react";
 import { BlogHeaderSettings } from "./settings";
 import type { BlogHeaderElementProps } from "./types";
@@ -25,6 +25,10 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
     connectors: { connect },
   } = useNode();
 
+  const { enabled } = useEditor((state) => ({
+    enabled: state.options.enabled
+  }));
+
   return (
     <header
       ref={(ref) => {
@@ -34,7 +38,7 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
     >
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-4xl font-bold">{title}</h1>
-        {is_published && (
+        {enabled && is_published && (
           <span className="px-3 py-1 bg-success/10 text-success text-sm rounded-md">
             Published
           </span>

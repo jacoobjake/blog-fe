@@ -29,7 +29,7 @@ export default async function RootLayout({
     <html
       suppressHydrationWarning
       lang="en"
-      className={`${figtree.variable} ${playfair.variable}`}
+      className={`${figtree.variable} ${playfair.variable} relative`}
     >
       <head>
         <script
@@ -51,7 +51,7 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="bg-background">{children}</body>
+      <body className="bg-background relative">{children}</body>
     </html>
   );
 }

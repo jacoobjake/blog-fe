@@ -28,10 +28,8 @@ export default function HeroTableLayout<T>({
 }: BasicTableLayoutProps<T>) {
   const rows = table.getRowModel().rows;
   const headerGroups = table.getHeaderGroups();
-  const columnCount = headerGroups[0]?.headers.length || 1;
   const { pageSize, pageIndex } = table.getState().pagination;
 
-  const emptyRowsCount = Math.max(0, pageSize - rows.length);
   const pageCount = table.getPageCount();
   const start = pageIndex * pageSize + 1;
   const end = start + rows.length - 1;

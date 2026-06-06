@@ -11,16 +11,31 @@ import {
   SpacerElement,
 } from "./elements";
 import { Topbar } from "./toolbars/topbar";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
 import { blogApi } from "@/lib/apis";
 import lz from "lz-string";
 import RightBar from "./toolbars/right-bar";
 import LeftBar from "./toolbars/left-bar";
 import { RenderNode } from "./render-node";
+import { useAuthStore } from "@/hooks/auth";
 
 type BlogEditorProps = {
   blog?: Blog;
+};
+
+function deserializeBlogContent(blog: Blog) {
+  if (!blog.json_content) return undefined;
+
+  const { type, body } = blog.json_content;
+
+  switch (type) {
+    case BlogContentType.CompressedBase64:
+      return lz.decompressFromBase64(body);
+    default:
+      // Fallback: use as-is
+      return typeof body === "string" ? body : JSON.stringify(body);
+  }
 };
 
 export default function BlogEditor({ blog }: BlogEditorProps) {
@@ -95,30 +110,42 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
     }
   };
 
-  return (
-    <div className="w-full h-screen flex flex-col bg-background overflow-hidden">
-      <Editor
-        resolver={{
-          TextElement,
-          ContainerElement,
-          ButtonElement,
-          BlogHeaderElement,
-          RootCanvas,
-          SpacerElement,
-        }}
-        enabled={!isPreview}
-        onRender={RenderNode}
-      >
-        <EditorContent
-          blog={blog}
-          isPreview={isPreview}
-          isSaving={isSaving}
-          onPreview={handlePreview}
-          onFinish={handleFinish}
-        />
-      </Editor>
+  return <div className="w-full h-screen flex flex-col bg-background overflow-hidden">
+    <EditorContainer enabled={!isPreview} >
+      <EditorContent
+        blog={blog}
+        isPreview={isPreview}
+        isSaving={isSaving}
+        onPreview={handlePreview}
+        onFinish={handleFinish} />
+    </EditorContainer>
+  </div>;
+}
+
+export function BlogContentViewer({ blog }: { blog: Blog }) {
+  return <EditorContainer enabled={false}>
+    <div className="flex-1 overflow-y-auto page-container max-w-4xl mx-auto">
+      <Frame data={deserializeBlogContent(blog)}>
+      </Frame>
     </div>
-  );
+  </EditorContainer>;
+}
+
+function EditorContainer({ enabled, children }: { enabled: boolean, children: ReactNode }) {
+  return <Editor
+    resolver={{
+      TextElement,
+      ContainerElement,
+      ButtonElement,
+      BlogHeaderElement,
+      RootCanvas,
+      SpacerElement,
+    }}
+    enabled={enabled}
+    onRender={RenderNode}
+  >
+    {children}
+  </Editor>
 }
 
 function EditorContent({
@@ -135,24 +162,10 @@ function EditorContent({
   onFinish: (query: any, actions: any) => Promise<void>;
 }) {
   const { query, actions } = useEditor();
+  const user = useAuthStore((s) => s.user ?? undefined);
 
   const handleFinishClick = () => {
     onFinish(query, actions);
-  };
-
-  // Load editor data based on content type
-  const getEditorData = () => {
-    if (!blog?.json_content) return undefined;
-
-    const { type, body } = blog.json_content;
-
-    switch (type) {
-      case BlogContentType.CompressedBase64:
-        return lz.decompressFromBase64(body);
-      default:
-        // Fallback: use as-is
-        return typeof body === "string" ? body : JSON.stringify(body);
-    }
   };
 
   return (
@@ -169,12 +182,8 @@ function EditorContent({
         {!isPreview && <LeftBar />}
         {/* Main editor area */}
         <div className="flex-1 overflow-y-auto page-container max-w-4xl mx-auto">
-          <Frame data={getEditorData()}>
-            <RootCanvas>
-              {/* <Element is={ContainerElement} padding={20} canvas>
-                <TextElement text="Start writing your blog content here..." />
-              </Element> */}
-            </RootCanvas>
+          <Frame data={blog ? deserializeBlogContent(blog) : undefined}>
+            <RootCanvas user={user} />
           </Frame>
         </div>
 

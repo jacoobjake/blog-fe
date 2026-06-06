@@ -17,6 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Chip } from "@heroui/react";
 import OpenEditorButton from "@/components/editors/open-editor-btn";
 import HeroTableLayout from "../layouts/hero-table";
+import { dateToDatetimeString } from "@/lib/utils";
 
 export default function BlogList() {
   const queryClient = useQueryClient();
@@ -46,10 +47,18 @@ export default function BlogList() {
       {
         accessorKey: "created_at",
         header: "Created At",
+        cell: (info) => {
+          const dt = new Date(info.row.original.created_at);
+          return dateToDatetimeString(dt);
+        }
       },
       {
         accessorKey: "updated_at",
         header: "Updated At",
+        cell: (info) => {
+          const dt = new Date(info.row.original.updated_at);
+          return dateToDatetimeString(dt);
+        }
       },
       {
         id: "actions",

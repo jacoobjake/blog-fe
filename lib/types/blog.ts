@@ -12,6 +12,6 @@ export type Blog = {
   author: string;
   is_published: boolean;
   tags: { name: string }[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: string;
+  updated_at: string;
 };

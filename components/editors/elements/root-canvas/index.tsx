@@ -2,20 +2,19 @@
 
 import { useNode, Element, UserComponent } from "@craftjs/core";
 import { BlogHeaderElement } from "../blog-header";
-import { useAuthStore } from "@/hooks/auth";
 import { TextElement } from "../text";
 import { ContainerElement } from "../container";
+import { User } from "@/lib/types";
 
 export type RootCanvasProps = {
+  user?: User
   children?: React.ReactNode;
 };
 
-export const RootCanvas: UserComponent<RootCanvasProps> = ({ children }) => {
+export const RootCanvas: UserComponent<RootCanvasProps> = ({ user, children }) => {
   const {
     connectors: { connect },
   } = useNode();
-
-  const user = useAuthStore((s) => s.user);
 
   return (
     <div
