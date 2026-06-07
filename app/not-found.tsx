@@ -1,8 +1,8 @@
-import Link from "@/components/ui/general/link";
+import { Link } from "@/components/ui/nav";
 
 export default function GeneralNotFound() {
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center text-accent space-y-2">
+    <div className="w-full h-screen flex flex-col items-center justify-center text-accent space-y-2 text-center">
       <h1 className="text-4xl font-bold">
         404 - Ooops! The Resource You Are Looking For Is Not Found
       </h1>

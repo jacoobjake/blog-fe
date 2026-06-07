@@ -1,5 +1,5 @@
-import PublicHeader from "@/components/nav/public/header";
-import PublicFooter from "@/components/nav/public/footer";
+import { PublicHeader, PublicFooter } from "@/components/nav/public";
+import PublicUiProvider from "@/providers/public-ui-provider";
 
 export default function PublicLayout({
   children,
@@ -7,10 +7,10 @@ export default function PublicLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <PublicUiProvider>
       <PublicHeader />
       {children}
       <PublicFooter />
-    </>
+    </PublicUiProvider>
   );
 }

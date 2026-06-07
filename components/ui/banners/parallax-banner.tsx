@@ -33,7 +33,7 @@ export default function ParallaxBanner({
   return (
     <div
       ref={containerRef}
-      className="relative h-screen overflow-hidden w-full flex items-center justify-center text-white/90 font-sans"
+      className="relative h-dvh overflow-hidden w-full flex items-center justify-center text-white/90 font-sans"
     >
       <motion.div
         style={{ y }}

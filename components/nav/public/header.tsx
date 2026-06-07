@@ -1,12 +1,10 @@
-import ThemeSwitch from "@/components/ui/theme/theme-switch";
-import { NAV_ROUTES } from "@/lib/routes";
-import { ThemeContextProvider } from "@/providers";
+import { ThemeSwitch } from "@/components/ui/theme";
+import { NAV_ROUTES } from "@/constants/routes";
 import MobileMenu from "./mobile-menu";
 
-export default function PublicHeader() {
+export default async function PublicHeader() {
   return (
-    <ThemeContextProvider>
-      <div className="flex items-center justify-between p-6 gap-8 text-accent bg-accent/10">
+      <div className="flex items-center justify-between p-6 gap-8 text-accent bg-surface">
         <h1 className="text-3xl font-bold">
           {process.env.NEXT_PUBLIC_APP_NAME}
         </h1>
@@ -23,7 +21,6 @@ export default function PublicHeader() {
           <ThemeSwitch />
         </div>
         <MobileMenu />
-      </div>
-    </ThemeContextProvider>
+    </div>
   );
 }
