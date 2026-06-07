@@ -4,6 +4,7 @@ import { type ReactNode, createContext, useState } from "react";
 
 import { createThemeStore } from "@/stores";
 import { ThemeState } from "@/stores/types";
+import { ThemeApplier } from "./theme-applier";
 
 type ThemeStoreApi = ReturnType<typeof createThemeStore>;
 
@@ -20,5 +21,10 @@ export const ThemeContextProvider = ({
 }: ThemeStoreProviderProps) => {
   const [store] = useState(() => createThemeStore(initialState));
 
-  return <ThemeContext value={store}>{children}</ThemeContext>;
+  return (
+    <ThemeContext value={store}>
+      <ThemeApplier store={store} />
+      {children}
+    </ThemeContext>
+  );
 };

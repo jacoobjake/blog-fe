@@ -22,6 +22,7 @@ export default function AdminHeader() {
       >
         <Button
           isIconOnly
+          aria-label="Open sidebar"
           variant="ghost"
           className="rounded-md"
           onClick={() => setIsSideMenuOpen(true)}

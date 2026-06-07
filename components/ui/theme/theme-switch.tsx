@@ -7,19 +7,13 @@ import { FiMoon, FiSun } from "react-icons/fi";
 export default function ThemeSwitch({ className }: { className?: string }) {
   const { theme, setTheme } = useThemeStore((state) => state);
 
-  const handleThemeChange = async () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add(newTheme);
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    document.documentElement.setAttribute("data-theme", newTheme);
+  const handleThemeChange = () => {
+    setTheme(theme === "light" ? "dark" : "light");
   };
 
   return (
     <Button
+      aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
       onClick={handleThemeChange}
       className={cn(
         "relative focus:ring-0 bg-transparent text-foreground transition-all duration-100 hover:bg-accent-soft-hover cursor-pointer",

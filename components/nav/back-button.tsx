@@ -20,7 +20,7 @@ export default function BackButton({ href }: BackButtonProps) {
   };
 
   return (
-    <Button variant="ghost" isIconOnly onClick={handleClick}>
+    <Button variant="ghost" isIconOnly aria-label="Go back" onClick={handleClick}>
       <FiArrowLeft />
     </Button>
   );

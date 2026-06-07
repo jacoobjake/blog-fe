@@ -14,6 +14,7 @@ const playfair = Playfair_Display({
 });
 
 import "@/styles/globals.css";
+import { THEME_STORAGE_KEY } from "@/constants";
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_NAME,
@@ -37,15 +38,19 @@ export default async function RootLayout({
             __html: `
               (function() {
                   try {
-                      var theme = localStorage.getItem('theme-storage');
+                      var theme = null;
+                      var stored = localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)});
+                      if (stored) {
+                          var parsed = JSON.parse(stored);
+                          theme = parsed.state && parsed.state.theme;
+                      }
                       if (!theme) {
                           theme = window.matchMedia('(prefers-color-scheme: dark)').matches
                               ? 'dark'
                               : 'light';
                       }
-                      if (theme === 'dark') {
-                          document.documentElement.classList.add('dark');
-                      }
+                      document.documentElement.setAttribute('data-theme', theme);
+                      document.documentElement.classList.toggle('dark', theme === 'dark');
                   } catch (_) {}
               })();`,
           }}

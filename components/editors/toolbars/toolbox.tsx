@@ -88,6 +88,7 @@ export const SlimToolbox = () => {
     <Surface className="grid grid-cols-1 gap-2">
       <SlimToolboxButton
         icon={<MdTextFields />}
+        ariaLabel="Add text block"
         onCreate={(ref) => {
           if (ref) {
             connectors.create(ref, <TextElement text="New text block" />);
@@ -97,6 +98,7 @@ export const SlimToolbox = () => {
       />
       <SlimToolboxButton
         icon={<MdOutlineRectangle />}
+        ariaLabel="Add container"
         onCreate={(ref) => {
           if (ref) {
             connectors.create(
@@ -111,6 +113,7 @@ export const SlimToolbox = () => {
       />
       <SlimToolboxButton
         icon={<MdOutlineTouchApp />}
+        ariaLabel="Add button"
         onCreate={(ref) => {
           if (ref) {
             connectors.create(ref, <ButtonElement label="Click me" />);
@@ -120,6 +123,7 @@ export const SlimToolbox = () => {
       />
       <SlimToolboxButton
         icon={<CgSpaceBetweenV />}
+        ariaLabel="Add spacer"
         onCreate={(ref) => {
           if (ref) {
             connectors.create(ref, <SpacerElement height={40} />);
@@ -133,10 +137,12 @@ export const SlimToolbox = () => {
 
 const SlimToolboxButton = ({
   icon,
+  ariaLabel,
   onCreate,
   tooltip,
 }: {
   icon: React.ReactNode;
+  ariaLabel: string;
   onCreate: (ref: HTMLButtonElement | null) => void;
   tooltip: React.ReactNode;
 }) => {
@@ -150,6 +156,7 @@ const SlimToolboxButton = ({
         size="sm"
         className="cursor-move"
         isIconOnly
+        aria-label={ariaLabel}
       >
         {icon}
       </Button>

@@ -28,6 +28,7 @@ export default function MobileMenu() {
       <Button
         variant="ghost"
         isIconOnly
+        aria-label="Open navigation menu"
         className="text-accent rounded-md"
         onPress={open}
       >
@@ -61,10 +62,14 @@ export default function MobileMenu() {
             "data-exiting:zoom-out-100",
           )}
         >
-          <Modal.Dialog className="fixed rounded-r-none inset-y-0 right-0 w-5/8 bg-surface space-y-4 shadow-sm shadow-accent-foreground">
+          <Modal.Dialog
+            aria-label="Navigation menu"
+            className="fixed rounded-r-none inset-y-0 right-0 w-5/8 bg-surface space-y-4 shadow-sm shadow-accent-foreground"
+          >
             <Modal.Header className="flex flex-row justify-end w-full items-center gap-2">
               <ThemeSwitch />
               <CloseButton
+                aria-label="Close navigation menu"
                 onClick={close}
                 className="bg-transparent transition-transform hover:scale-130 text-accent"
               />

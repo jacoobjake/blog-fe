@@ -13,12 +13,14 @@ import {
 import { Topbar } from "./toolbars/topbar";
 import { ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
-import { blogApi } from "@/lib/apis";
+import { createBlogAction, updateBlogAction } from "@/lib/actions";
 import lz from "lz-string";
 import RightBar from "./toolbars/right-bar";
 import LeftBar from "./toolbars/left-bar";
 import { RenderNode } from "./render-node";
 import { useAuthStore } from "@/hooks/auth";
+import { useBlogEditorCrumbs, useBlogHeaderTitle } from "@/hooks/editors";
+import { PublicBreadcrumbsList } from "@/components/nav/public/breadcrumbs";
 
 type BlogEditorProps = {
   blog?: Blog;
@@ -72,7 +74,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
 
       if (blog?.slug) {
         // Update existing blog
-        await blogApi.updateBlog(blog.slug, {
+        await updateBlogAction(blog.slug, {
           title: title.trim(),
           author: author.trim(),
           json_content: {
@@ -84,7 +86,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
         });
       } else {
         // Create new blog
-        const response = await blogApi.createBlog({
+        const response = await createBlogAction({
           title: title.trim(),
           author: author.trim(),
           json_content: {
@@ -123,12 +125,11 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
 }
 
 export function BlogContentViewer({ blog }: { blog: Blog }) {
-  return <EditorContainer enabled={false}>
-    <div className="flex-1 overflow-y-auto page-container max-w-4xl mx-auto">
-      <Frame data={deserializeBlogContent(blog)}>
-      </Frame>
-    </div>
-  </EditorContainer>;
+  return (
+    <EditorContainer enabled={false}>
+      <Frame data={deserializeBlogContent(blog)} />
+    </EditorContainer>
+  );
 }
 
 function EditorContainer({ enabled, children }: { enabled: boolean, children: ReactNode }) {
@@ -148,6 +149,18 @@ function EditorContainer({ enabled, children }: { enabled: boolean, children: Re
   </Editor>
 }
 
+function BlogEditorBreadcrumbs({
+  slug,
+  title,
+}: {
+  slug?: string;
+  title: string;
+}) {
+  const crumbs = useBlogEditorCrumbs(slug, title);
+
+  return <PublicBreadcrumbsList crumbs={crumbs} linkable={false} />;
+}
+
 function EditorContent({
   blog,
   isPreview,
@@ -163,6 +176,7 @@ function EditorContent({
 }) {
   const { query, actions } = useEditor();
   const user = useAuthStore((s) => s.user ?? undefined);
+  const title = useBlogHeaderTitle();
 
   const handleFinishClick = () => {
     onFinish(query, actions);
@@ -181,7 +195,8 @@ function EditorContent({
         {/* Left sidebar with toolbox */}
         {!isPreview && <LeftBar />}
         {/* Main editor area */}
-        <div className="flex-1 overflow-y-auto page-container max-w-4xl mx-auto">
+        <div className="flex-1 overflow-y-auto page-container w-full max-w-5xl mx-auto p-6">
+          <BlogEditorBreadcrumbs slug={blog?.slug} title={title} />
           <Frame data={blog ? deserializeBlogContent(blog) : undefined}>
             <RootCanvas user={user} />
           </Frame>

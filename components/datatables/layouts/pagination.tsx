@@ -12,6 +12,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
     <div className="flex items-center gap-2 justify-end">
       <Button
         isIconOnly
+        aria-label="First page"
         variant="outline"
         onClick={() => table.firstPage()}
         isDisabled={!table.getCanPreviousPage()}
@@ -20,6 +21,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
       </Button>
       <Button
         isIconOnly
+        aria-label="Previous page"
         variant="outline"
         onClick={() => table.previousPage()}
         isDisabled={!table.getCanPreviousPage()}
@@ -28,6 +30,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
       </Button>
       <Button
         isIconOnly
+        aria-label="Next page"
         variant="outline"
         onClick={() => table.nextPage()}
         isDisabled={!table.getCanNextPage()}
@@ -36,6 +39,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
       </Button>
       <Button
         isIconOnly
+        aria-label="Last page"
         variant="outline"
         onClick={() => table.lastPage()}
         isDisabled={!table.getCanNextPage()}
@@ -53,6 +57,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
       <span className="flex items-center gap-2">
         Go to page:
         <Input
+          aria-label="Go to page"
           type="number"
           min="1"
           max={table.getPageCount()}
@@ -65,6 +70,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
       </span>
       <Select
         className="w-28"
+        aria-label="Select number of items per page"
         value={table.getState().pagination.pageSize}
         onChange={(v) => {
           table.setPageSize(Number(v));
@@ -77,7 +83,7 @@ export default function Pagination<T>({ table }: { table: Table<T> }) {
         <Select.Popover>
           <ListBox>
             {[10, 20, 30, 40, 50].map((pageSize) => (
-              <ListBox.Item key={pageSize} id={pageSize}>
+              <ListBox.Item key={pageSize} id={pageSize} textValue={pageSize.toString()}>
                 Show {pageSize}
                 <ListBox.ItemIndicator />
               </ListBox.Item>

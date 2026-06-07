@@ -4,6 +4,7 @@ import { useEditor, useNode, UserComponent } from "@craftjs/core";
 import { cn } from "@heroui/react";
 import { BlogHeaderSettings } from "./settings";
 import type { BlogHeaderElementProps } from "./types";
+import { dateToDatetimeString } from "@/lib/utils/date";
 
 export type { BlogHeaderElementProps } from "./types";
 
@@ -12,6 +13,7 @@ const defaultProps: Partial<BlogHeaderElementProps> = {
   description: "",
   author: "Anonymous",
   tags: [],
+  created_at: new Date(),
 };
 
 export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
@@ -20,6 +22,7 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
   author,
   is_published,
   tags = [],
+  created_at,
 }) => {
   const {
     connectors: { connect },
@@ -45,9 +48,13 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
         )}
       </div>
       {description && <p className="text-lg text-muted mb-4">{description}</p>}
-      <div className="flex items-center gap-4 text-sm text-muted">
+      <div className="flex items-center gap-4 text-sm text-muted mb-2">
         <span>By {author}</span>
-        {tags && tags.length > 0 && (
+      </div>
+      <div className="flex items-center gap-4 text-xs text-muted/70">
+        <span>{dateToDatetimeString(created_at)}</span>
+      </div>
+      {tags && tags.length > 0 && (
           <div className="flex gap-2">
             {tags.map((tag, index) => (
               <span
@@ -58,8 +65,7 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
               </span>
             ))}
           </div>
-        )}
-      </div>
+      )}
     </header>
   );
 };

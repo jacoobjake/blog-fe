@@ -1,14 +1,10 @@
 import { Blog } from "@/lib/types";
 import { dateToDateString } from "@/lib/utils";
 import Link from "next/link";
-// import { useRouter } from "next/navigation";
 
 
 export default function BlogListCard({ blog }: { blog: Blog, height?: number }) {
     const createdAt = new Date(blog.created_at);
-    // const router = useRouter();
-
-    // const redirectToBlog = () => router.push(`/blogs/${blog.slug}`);
 
     return (
         <Link href={`/blogs/${blog.slug}`}>

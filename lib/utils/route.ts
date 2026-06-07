@@ -49,25 +49,69 @@ export function matchesRoutePattern(
   return false;
 }
 
+export type Crumb = {
+  label: string;
+  href: string;
+};
+
+function formatSegmentLabel(segment: string) {
+  return segment
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function generateCrumbs(
   pathname: string,
   routes: RouteConfig[],
-): { label: string; href: string }[] {
-  const crumbs: { label: string; href: string }[] = [];
+  options?: {
+    /** Override labels for specific hrefs (e.g. blog title on detail pages). */
+    labelOverrides?: Record<string, string>;
+  },
+): Crumb[] {
+  const crumbs: Crumb[] = [];
   const parts = pathname.split("/").filter(Boolean);
 
   for (let i = 0; i < parts.length; i++) {
     const href = "/" + parts.slice(0, i + 1).join("/");
-    const matchedRoute = routes.find((route) =>
-      matchesRoutePattern(href, route.pattern),
+    const exactRoute = routes.find((route) => route.href === href);
+
+    if (exactRoute) {
+      if (!crumbs.some((crumb) => crumb.href === href)) {
+        crumbs.push({ label: exactRoute.label, href });
+      }
+      continue;
+    }
+
+    const isLeafSegment = i === parts.length - 1;
+    if (!isLeafSegment) {
+      continue;
+    }
+
+    const parentHref = i > 0 ? "/" + parts.slice(0, i).join("/") : "/";
+    const parentRoute = routes.find(
+      (route) =>
+        route.href === parentHref ||
+        matchesRoutePattern(parentHref, route.pattern),
     );
 
-    if (
-      matchedRoute &&
-      !crumbs.some((crumb) => crumb.href === matchedRoute.href)
-    ) {
-      crumbs.push({ label: matchedRoute.label, href });
+    if (!parentRoute) {
+      continue;
     }
+
+    crumbs.push({
+      label: options?.labelOverrides?.[href] ?? formatSegmentLabel(parts[i]),
+      href,
+    });
+  }
+
+  const homeRoute = routes.find((route) => route.href === "/");
+  if (
+    pathname !== "/" &&
+    homeRoute &&
+    !crumbs.some((crumb) => crumb.href === homeRoute.href)
+  ) {
+    crumbs.unshift({ label: homeRoute.label, href: homeRoute.href });
   }
 
   return crumbs;

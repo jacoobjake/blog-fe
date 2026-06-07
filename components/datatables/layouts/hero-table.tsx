@@ -41,7 +41,10 @@ export default function HeroTableLayout<T>({
     <div className="relative">
       <HeroTable>
         <HeroTable.ScrollContainer>
-          <HeroTable.Content sortDescriptor={sortDescriptor}>
+          <HeroTable.Content
+            aria-label="Data table"
+            sortDescriptor={sortDescriptor}
+          >
             <HeroTable.Header>
               {headerGroups.map((headerGroup) => (
                 <Fragment key={headerGroup.id}>
@@ -95,6 +98,7 @@ export default function HeroTableLayout<T>({
               <Pagination.Content className="space-x-2">
                 <Pagination.Item>
                   <Pagination.Previous
+                    aria-label="Previous page"
                     isDisabled={!table.getCanPreviousPage()}
                     onPress={() => table.previousPage()}
                   >
@@ -104,6 +108,7 @@ export default function HeroTableLayout<T>({
                 </Pagination.Item>
                 <Pagination.Item>
                   <Pagination.Next
+                    aria-label="Next page"
                     isDisabled={!table.getCanNextPage()}
                     onPress={() => table.nextPage()}
                   >
@@ -123,6 +128,7 @@ export default function HeroTableLayout<T>({
                   <span className="flex items-center gap-2">
                     Go to page:
                     <Input
+                      aria-label="Go to page"
                       type="number"
                       min="1"
                       max={table.getPageCount()}
@@ -153,7 +159,7 @@ export default function HeroTableLayout<T>({
                     <Select.Popover>
                       <ListBox>
                         {[10, 20, 30, 40, 50].map((pageSize) => (
-                          <ListBox.Item key={pageSize} id={pageSize}>
+                          <ListBox.Item key={pageSize} id={pageSize} textValue={pageSize.toString()}>
                             Show {pageSize}
                             <ListBox.ItemIndicator />
                           </ListBox.Item>

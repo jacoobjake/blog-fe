@@ -24,7 +24,7 @@ export default function OpenEditorButton({
   };
 
   return (
-    <Button isIconOnly variant={variant} onClick={handleClick}>
+    <Button isIconOnly aria-label="Open editor" variant={variant} onClick={handleClick}>
       <FiLayout />
     </Button>
   );

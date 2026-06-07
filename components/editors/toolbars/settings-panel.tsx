@@ -30,7 +30,7 @@ export const SettingsPanel = () => {
       <div className="grid grid-cols-1 gap-2">
         <div className="col-span-2 w-full flex justify-between items-center gap-1">
           <p>Selected</p>
-          <Select>
+          <Select aria-label="Selected element">
             <Select.Trigger>{selected.name}</Select.Trigger>
           </Select>
         </div>

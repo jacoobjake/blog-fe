@@ -34,7 +34,7 @@ export default function PublicBlogList() {
 
     return (
         <div>
-            <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4">
                 {
                     data?.data?.map((blog) => <BlogListCard key={blog.slug} blog={blog} />)
                 }

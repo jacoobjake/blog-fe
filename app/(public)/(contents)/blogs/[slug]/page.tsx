@@ -1,4 +1,5 @@
 import { BlogContentViewer } from "@/components/editors/blog-editor";
+import BreadcrumbPageLabel from "@/components/nav/public/breadcrumb-page-label";
 import { getServerBlogApi } from "@/lib/apis/server";
 import { notFound } from "next/navigation";
 
@@ -34,5 +35,10 @@ export default async function BlogPage({ params }: { params: Promise<{ slug: str
         notFound();
     }
 
-    return <BlogContentViewer blog={blog} />
+    return (
+        <>
+            <BreadcrumbPageLabel label={blog.title} />
+            <BlogContentViewer blog={blog} />
+        </>
+    );
 }

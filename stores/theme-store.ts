@@ -1,3 +1,4 @@
+import { THEME_STORAGE_KEY } from "@/constants";
 import { createStore } from "zustand";
 
 import type { ThemeState, ThemeStore } from "@/stores/types";
@@ -14,7 +15,7 @@ export const createThemeStore = (initState: ThemeState = defaultInitState) => {
         ...initState,
         setTheme: (theme) => set({ theme }),
       }),
-      { name: "theme-storage" },
+      { name: THEME_STORAGE_KEY },
     ),
   );
 };

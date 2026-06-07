@@ -27,6 +27,7 @@ export default function AdminSideMenu() {
         <Button
           variant="ghost"
           isIconOnly
+          aria-label="Close sidebar"
           className="rounded-md"
           onPress={() => setIsSideMenuOpen(false)}
         >

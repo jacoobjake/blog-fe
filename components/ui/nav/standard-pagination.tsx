@@ -43,10 +43,11 @@ export default function StandardPagination({
     const pages = getPages(page, totalPages);
 
     return (
-        <Pagination>
+        <Pagination className="justify-center">
             <Pagination.Content className="self-center">
                 <Pagination.Item>
                     <Pagination.Previous
+                        aria-label="Previous page"
                         isDisabled={page === 1}
                         onPress={() => setPage(page - 1)}
                     >
@@ -75,6 +76,7 @@ export default function StandardPagination({
                 ))}
                 <Pagination.Item>
                     <Pagination.Next
+                        aria-label="Next page"
                         isDisabled={page === totalPages}
                         onPress={() => setPage(page + 1)}
                     >

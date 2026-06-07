@@ -21,26 +21,25 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ user, children }) =
       ref={(ref) => {
         if (ref) connect(ref);
       }}
-      className="bg-background p-8"
+      className="bg-background w-full"
     >
-      <div className="max-w-4xl mx-auto">
-        {/* Non-deletable blog header */}
-        <Element
-          id="blog-header"
-          is={BlogHeaderElement}
-          canvas={false}
-          title="Untitled Blog Post"
-          author={user?.name || "Anonymous"}
-          is_published={false}
-          tags={[]}
-        />
+      {/* Non-deletable blog header */}
+      <Element
+        id="blog-header"
+        is={BlogHeaderElement}
+        canvas={false}
+        title="Untitled Blog Post"
+        author={user?.name || "Anonymous"}
+        is_published={false}
+        tags={[]}
+        created_at={new Date()}
+      />
 
-        {/* Content area */}
-        <Element id="blog-content" is={ContainerElement} padding={20} canvas>
-          <TextElement text="Start writing your blog content here..." />
-          {children}
-        </Element>
-      </div>
+      {/* Content area */}
+      <Element id="blog-content" is={ContainerElement} padding={20} canvas>
+        <TextElement text="Start writing your blog content here..." />
+        {children}
+      </Element>
     </div>
   );
 };
