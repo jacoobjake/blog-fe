@@ -1,4 +1,4 @@
-import type { LoginDto } from "@/lib/schemas";
+import type { ChangePasswordDto, LoginDto } from "@/lib/schemas";
 import type { User } from "@/lib/types";
 
 import { createGraphqlClient } from "./graphql";
@@ -43,6 +43,14 @@ export function createAuthApi(fetcher: ApiFetcher) {
     me: async (): Promise<User> => {
       const data = await gql.request<{ me: User }>(meQuery());
       return data.me;
+    },
+
+    updatePassword: async (dto: ChangePasswordDto): Promise<void> => {
+      await fetcher({
+        path: "api/admin/profile/password",
+        method: "PUT",
+        body: dto,
+      });
     },
   };
 }

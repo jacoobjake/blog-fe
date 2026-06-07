@@ -1,13 +1,16 @@
 "use client";
 
 import { useAuth } from "@/hooks/auth";
-import { Avatar, Button, Popover } from "@heroui/react";
-import { useRouter } from "next/navigation";
-import { FiLogOut } from "react-icons/fi";
+import { Avatar, Button, Popover, cn } from "@heroui/react";
+import { buttonVariants } from "@heroui/styles";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { FiLogOut, FiUser } from "react-icons/fi";
 
 export default function AdminAccountMenu() {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = async () => {
     await logout();
@@ -15,7 +18,7 @@ export default function AdminAccountMenu() {
   };
 
   return (
-    <Popover>
+    <Popover key={pathname}>
       <Popover.Trigger>
         <div className="flex gap-3 items-center">
           <Avatar />
@@ -24,6 +27,16 @@ export default function AdminAccountMenu() {
       </Popover.Trigger>
       <Popover.Content className="w-48" placement="bottom">
         <div className="p-4 flex flex-col gap-2">
+          <Link
+            href="/admin/profile"
+            className={cn(
+              buttonVariants({ variant: "ghost", fullWidth: true }),
+              "justify-start",
+            )}
+          >
+            <FiUser />
+            Profile
+          </Link>
           <Button
             variant="ghost"
             onPress={handleLogout}
