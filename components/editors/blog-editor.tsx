@@ -186,6 +186,7 @@ function EditorContent({
     <>
       {/* Toolbar outside canvas */}
       <Topbar
+        isPreview={isPreview}
         onPreview={onPreview}
         onFinish={handleFinishClick}
         isSaving={isSaving}

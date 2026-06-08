@@ -1,51 +1,139 @@
 "use client";
 
+import { Label, TextField, cn } from "@heroui/react";
 import {
-  Label,
-  ListBox,
-  ListBoxItem,
-  Select,
-  SelectProps,
-} from "@heroui/react";
+  type ClipboardEvent,
+  type KeyboardEvent,
+  useState,
+} from "react";
 
-type TagsFieldProps = SelectProps<string[], "multiple">;
+type TagsFieldProps = {
+  value: string[];
+  onChange: (tags: string[]) => void;
+  onBlur?: () => void;
+  name?: string;
+  isInvalid?: boolean;
+  label?: string;
+  placeholder?: string;
+  errorMessage?: string;
+  "aria-label"?: string;
+};
 
-export default function TagsField(props: TagsFieldProps) {
+function normalizeTag(raw: string): string {
+  return raw.trim();
+}
+
+function mergeTags(existing: string[], incoming: string[]): string[] {
+  const seen = new Set(existing.map((tag) => tag.toLowerCase()));
+  const merged = [...existing];
+
+  for (const raw of incoming) {
+    const tag = normalizeTag(raw);
+    if (!tag) continue;
+
+    const key = tag.toLowerCase();
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    merged.push(tag);
+  }
+
+  return merged;
+}
+
+export default function TagsField({
+  value,
+  onChange,
+  onBlur,
+  name,
+  isInvalid,
+  label = "Tags",
+  placeholder = "Type a tag, then press comma or Enter",
+  errorMessage,
+  "aria-label": ariaLabel,
+}: TagsFieldProps) {
+  const [inputValue, setInputValue] = useState("");
+  const tags = value ?? [];
+
+  const commitInput = (raw: string) => {
+    const incoming = raw.split(",").map(normalizeTag).filter(Boolean);
+    if (incoming.length === 0) return;
+
+    onChange(mergeTags(tags, incoming));
+    setInputValue("");
+  };
+
+  const removeTag = (index: number) => {
+    onChange(tags.filter((_, i) => i !== index));
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !inputValue && tags.length > 0) {
+      onChange(tags.slice(0, -1));
+      return;
+    }
+
+    if (e.key === "," || e.key === "Enter") {
+      e.preventDefault();
+      commitInput(inputValue);
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData("text");
+    if (!text.includes(",")) return;
+
+    e.preventDefault();
+    commitInput([inputValue, text].filter(Boolean).join(","));
+  };
+
+  const handleBlur = () => {
+    if (inputValue.trim()) {
+      commitInput(inputValue);
+    }
+    onBlur?.();
+  };
+
   return (
-    <div>
-      <Select {...props} selectionMode="multiple">
-        <Label>Tags</Label>
-        <Select.Trigger>
-          Select Tags
-          <Select.Indicator />
-        </Select.Trigger>
-        <Select.Popover>
-          <ListBox selectionMode="multiple">
-            <ListBox.Item id="tag1" textValue="tag1">
-              Tag 1
-              <ListBoxItem.Indicator />
-            </ListBox.Item>
-            <ListBox.Item id="tag2" textValue="tag2">
-              Tag 2
-              <ListBoxItem.Indicator />
-            </ListBox.Item>
-            <ListBox.Item id="tag3" textValue="tag3">
-              Tag 3
-              <ListBoxItem.Indicator />
-            </ListBox.Item>
-          </ListBox>
-        </Select.Popover>
-      </Select>
-      <div className="mt-2">
-        {props.value?.map((tag) => (
+    <TextField isInvalid={isInvalid} aria-label={ariaLabel ?? label}>
+      <Label>{label}</Label>
+      <div
+        className={cn(
+          "flex flex-wrap items-center gap-1.5 min-h-10 px-2 py-1.5",
+          "rounded-md border border-border bg-field-background",
+          isInvalid && "border-danger",
+        )}
+      >
+        {tags.map((tag, index) => (
           <span
-            key={tag}
-            className="inline-block bg-gray-200 rounded-full px-2 py-1 text-sm font-semibold text-gray-700 mr-2"
+            key={`${tag}-${index}`}
+            className="inline-flex items-center gap-1 rounded-full bg-surface-secondary px-2 py-0.5 text-sm"
           >
             {tag}
+            <button
+              type="button"
+              aria-label={`Remove ${tag}`}
+              className="text-muted hover:text-foreground leading-none"
+              onClick={() => removeTag(index)}
+            >
+              ×
+            </button>
           </span>
         ))}
+        <input
+          name={name}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onPaste={handlePaste}
+          onBlur={handleBlur}
+          placeholder={tags.length === 0 ? placeholder : undefined}
+          className="flex-1 min-w-24 bg-transparent outline-none text-sm px-1 py-0.5"
+        />
       </div>
-    </div>
+      {errorMessage && (
+        <span className="text-xs text-danger">{errorMessage}</span>
+      )}
+    </TextField>
   );
 }

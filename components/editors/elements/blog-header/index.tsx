@@ -51,20 +51,20 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
       <div className="flex items-center gap-4 text-sm text-muted mb-2">
         <span>By {author}</span>
       </div>
-      <div className="flex items-center gap-4 text-xs text-muted/70">
+      <div className="flex items-center gap-4 text-xs text-muted/70 mb-2">
         <span>{dateToDatetimeString(created_at)}</span>
       </div>
       {tags && tags.length > 0 && (
-          <div className="flex gap-2">
-            {tags.map((tag, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-surface-secondary rounded-md"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+        <div className="flex gap-1">
+          {tags.map((tag, index) => (
+            <span
+              key={index}
+              className="px-3 py-2 bg-accent rounded-full text-xs text-accent-foreground"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       )}
     </header>
   );

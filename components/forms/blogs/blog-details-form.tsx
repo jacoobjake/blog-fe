@@ -72,9 +72,12 @@ export default function BlogDetailsForm({ type, blog }: BlogDetailsFormProps) {
         control={control}
         render={({ field, fieldState }) => (
           <TagsField
-            {...field}
+            name={field.name}
             value={field.value ?? []}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
             isInvalid={fieldState.invalid}
+            errorMessage={fieldState.error?.message}
             aria-label="Tags"
           />
         )}

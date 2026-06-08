@@ -1,16 +1,18 @@
 "use client";
 
 import { Button } from "@heroui/react";
-import { FaChevronLeft, FaEye, FaCheck } from "react-icons/fa";
+import { FiCheck, FiChevronLeft, FiEye, FiEyeOff } from "react-icons/fi";
 import { useRouter } from "next/navigation";
 
 type TopbarProps = {
+  isPreview?: boolean;
   onPreview?: () => void;
   onFinish?: () => void;
   isSaving?: boolean;
 };
 
 export const Topbar = ({
+  isPreview = false,
   onPreview,
   onFinish,
   isSaving = false,
@@ -30,19 +32,24 @@ export const Topbar = ({
           size="sm"
           onPress={handleBack}
         >
-          <FaChevronLeft />
+          <FiChevronLeft className="size-4 shrink-0" />
           Back
         </Button>
       </div>
       <div className="flex gap-2">
         <Button
-          aria-label="Toggle Preview"
+          aria-label={isPreview ? "Exit preview" : "Enter preview"}
+          aria-pressed={isPreview}
           variant="outline"
           size="sm"
           onPress={onPreview}
         >
-          <FaEye />
-          Preview
+          {isPreview ? (
+            <FiEyeOff className="size-4 shrink-0" />
+          ) : (
+            <FiEye className="size-4 shrink-0" />
+          )}
+          {isPreview ? "Exit Preview" : "Preview"}
         </Button>
         <Button
           aria-label="Finish Editing"
@@ -51,7 +58,7 @@ export const Topbar = ({
           onPress={onFinish}
           isDisabled={isSaving}
         >
-          <FaCheck />
+          <FiCheck className="size-4 shrink-0" />
           {isSaving ? "Saving..." : "Finish Editing"}
         </Button>
       </div>

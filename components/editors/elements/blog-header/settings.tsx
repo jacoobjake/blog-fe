@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { BlogHeaderSchema } from "@/lib/schemas/blog";
 import { Surface, TextField, Label, Input, Checkbox } from "@heroui/react";
+import TagsField from "@/components/forms/fields/tags-field";
 import type { BlogHeaderElementProps } from "./types";
 
 export const BlogHeaderSettings = () => {
@@ -140,26 +141,19 @@ export const BlogHeaderSettings = () => {
         name="tags"
         control={control}
         render={({ field }) => (
-          <TextField>
-            <Label>Tags (comma-separated)</Label>
-            <Input
-              value={(field.value || []).join(", ")}
-              onChange={(e) => {
-                const newTags = e.target.value
-                  .split(",")
-                  .map((t) => t.trim())
-                  .filter(Boolean);
-                field.onChange(newTags);
-                setProp((props: BlogHeaderElementProps) => {
-                  props.tags = newTags;
-                });
-              }}
-              placeholder="react, typescript, tutorial"
-            />
-            {errors.tags && (
-              <span className="text-xs text-danger">{errors.tags.message}</span>
-            )}
-          </TextField>
+          <TagsField
+            value={field.value ?? []}
+            onChange={(newTags) => {
+              field.onChange(newTags);
+              setProp((props: BlogHeaderElementProps) => {
+                props.tags = newTags;
+              });
+            }}
+            onBlur={field.onBlur}
+            isInvalid={!!errors.tags}
+            errorMessage={errors.tags?.message}
+            placeholder="react, typescript, tutorial"
+          />
         )}
       />
     </Surface>

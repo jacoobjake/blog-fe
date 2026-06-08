@@ -44,3 +44,4 @@ next-env.d.ts
 /.open-next/
 
 /public/editor.css
+/.wrangler
