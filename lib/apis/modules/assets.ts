@@ -8,13 +8,17 @@ import type {
 } from "@/lib/types";
 import type { UploadAssetDto } from "@/lib/schemas";
 
-const ADMIN_ASSET_PATH = "api/admin/assets";
+const ASSET_PATH = "api/assets";
 
 type AssetListQueryVariables = {
   first: number;
   page: number;
   type?: AssetType;
 };
+
+function toGraphqlAssetType(type: AssetType): string {
+  return type.charAt(0).toUpperCase() + type.slice(1);
+}
 
 /**
  * Asset module factory.
@@ -38,8 +42,6 @@ export function createAssetApi(fetcher: ApiFetcher) {
             thumbnail_100
             thumbnail_200
           }
-          created_at
-          updated_at
         }
         paginatorInfo {
           count
@@ -67,8 +69,6 @@ export function createAssetApi(fetcher: ApiFetcher) {
           thumbnail_100
           thumbnail_200
         }
-        created_at
-        updated_at
       }
     }
   `;
@@ -78,11 +78,16 @@ export function createAssetApi(fetcher: ApiFetcher) {
       const formData = new FormData();
       formData.append("file", dto.file);
       formData.append("type", dto.type);
-      const response = await post<{ data: Asset }>(ADMIN_ASSET_PATH, formData);
-      return response.data;
+      const response = await post<{ data: { uuid: string } }>(
+        ASSET_PATH,
+        formData,
+      );
+      return gql.request<{ asset: Asset }>(assetByUuidQuery, {
+        uuid: response.data.uuid,
+      }).then((result) => result.asset);
     },
     deleteAsset: async (uuid: string) => {
-      return del(`${ADMIN_ASSET_PATH}/${uuid}`);
+      return del(`${ASSET_PATH}/${uuid}`);
     },
     getAsset: async (uuid: string) => {
       const response = await gql.request<{ asset: Asset }>(assetByUuidQuery, {
@@ -93,9 +98,13 @@ export function createAssetApi(fetcher: ApiFetcher) {
     listAssets: async (
       variables: AssetListQueryVariables = { first: 10, page: 1 },
     ) => {
+      const { type, ...rest } = variables;
       const response = await gql.request<{
         assets: GraphqlResponseWithPaginatorInfo<Asset>;
-      }>(assetListQuery, variables);
+      }>(assetListQuery, {
+        ...rest,
+        ...(type ? { type: toGraphqlAssetType(type) } : {}),
+      });
       return response.assets;
     },
   };

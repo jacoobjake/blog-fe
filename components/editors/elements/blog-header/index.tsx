@@ -23,6 +23,7 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
   is_published,
   tags = [],
   created_at,
+  coverImageUrl,
 }) => {
   const {
     connectors: { connect },
@@ -39,6 +40,15 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
       }}
       className={cn("mb-8 pb-6 border-b border-separator")}
     >
+      {coverImageUrl && (
+        <div className="mb-6 -mx-2">
+          <img
+            src={coverImageUrl}
+            alt={title}
+            className="w-full max-h-80 object-cover rounded-xl"
+          />
+        </div>
+      )}
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-4xl font-bold">{title}</h1>
         {enabled && is_published && (

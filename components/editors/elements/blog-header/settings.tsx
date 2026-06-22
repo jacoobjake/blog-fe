@@ -5,9 +5,11 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { BlogHeaderSchema } from "@/lib/schemas/blog";
-import { Surface, TextField, Label, Input, Checkbox } from "@heroui/react";
+import { Button, Surface, TextField, Label, Input, Checkbox } from "@heroui/react";
 import TagsField from "@/components/forms/fields/tags-field";
 import type { BlogHeaderElementProps } from "./types";
+import { useAssetPicker } from "@/components/assets";
+import type { Asset } from "@/lib/types";
 
 export const BlogHeaderSettings = () => {
   const {
@@ -16,6 +18,8 @@ export const BlogHeaderSettings = () => {
     author,
     is_published,
     tags,
+    coverAssetUuid,
+    coverImageUrl,
     actions: { setProp },
   } = useNode((node) => ({
     title: node.data.props.title as string,
@@ -23,6 +27,8 @@ export const BlogHeaderSettings = () => {
     author: node.data.props.author as string,
     is_published: node.data.props.is_published as boolean,
     tags: node.data.props.tags as string[],
+    coverAssetUuid: node.data.props.coverAssetUuid as string | undefined,
+    coverImageUrl: node.data.props.coverImageUrl as string | undefined,
   }));
 
   const {
@@ -40,8 +46,50 @@ export const BlogHeaderSettings = () => {
     },
   });
 
+  const handleSelectCover = (asset: Asset) => {
+    setProp((props: BlogHeaderElementProps) => {
+      props.coverAssetUuid = asset.uuid;
+      props.coverImageUrl = asset.media?.url;
+    });
+  };
+
+  const handleClearCover = () => {
+    setProp((props: BlogHeaderElementProps) => {
+      props.coverAssetUuid = undefined;
+      props.coverImageUrl = undefined;
+    });
+  };
+
+  const { open, picker } = useAssetPicker({
+    onSelect: handleSelectCover,
+    selectedUuid: coverAssetUuid,
+  });
+
   return (
     <Surface className="space-y-4">
+      <div className="space-y-2">
+        <Label>Cover image</Label>
+        {coverImageUrl ? (
+          <img
+            src={coverImageUrl}
+            alt="Cover preview"
+            className="w-full h-28 object-cover rounded-md"
+          />
+        ) : (
+          <p className="text-xs text-muted">No cover image selected.</p>
+        )}
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" className="flex-1" onPress={open}>
+            {coverImageUrl ? "Change cover" : "Choose cover"}
+          </Button>
+          {coverImageUrl && (
+            <Button variant="ghost" size="sm" onPress={handleClearCover}>
+              Remove
+            </Button>
+          )}
+        </div>
+      </div>
+
       <Controller
         name="title"
         control={control}
@@ -156,6 +204,7 @@ export const BlogHeaderSettings = () => {
           />
         )}
       />
+      {picker}
     </Surface>
   );
 };

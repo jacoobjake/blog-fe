@@ -56,6 +56,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
           slug
           title
           author
+          json_content
           tags {
             name
           }
@@ -163,7 +164,14 @@ export function createBlogApi(fetcher: ApiFetcher) {
       const response = await gql.request<{
         blogsPublic: GraphqlResponseWithPaginatorInfo<Blog>;
       }>(publicBlogListQuery, variables);
-      return response.blogsPublic;
+      const blogs = response.blogsPublic;
+      blogs.data = blogs.data.map((blog) => {
+        if (blog.json_content && typeof blog.json_content === "string") {
+          return { ...blog, json_content: JSON.parse(blog.json_content) };
+        }
+        return blog;
+      });
+      return blogs;
     },
     listPublicBlogSlugs: async (
       variables: BlogListQueryVariables = { first: 10, page: 1 },

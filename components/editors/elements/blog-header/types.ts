@@ -3,6 +3,8 @@ export type BlogHeaderElementProps = {
   description?: string;
   author: string;
   is_published: boolean;
-  tags: string[]; 
+  tags: string[];
   created_at: Date | string;
+  coverAssetUuid?: string;
+  coverImageUrl?: string;
 };

@@ -3,18 +3,20 @@
 import { Element, useEditor } from "@craftjs/core";
 import { Button, Surface, Tooltip } from "@heroui/react";
 import {
+  AssetImageElement,
   ButtonElement,
   ContainerElement,
   TextElement,
   SpacerElement,
 } from "../elements";
 import {
+  MdOutlineImage,
   MdOutlineRectangle,
   MdOutlineTouchApp,
   MdTextFields,
 } from "react-icons/md";
-import { LuBlocks } from "react-icons/lu";
 import { CgSpaceBetweenV } from "react-icons/cg";
+import type { Asset } from "@/lib/types";
 
 export const Toolbox = () => {
   const { connectors } = useEditor();
@@ -63,6 +65,21 @@ export const Toolbox = () => {
           className="w-full justify-start"
         >
           Button
+        </Button>
+        <Button
+          ref={(ref) => {
+            if (ref) {
+              connectors.create(
+                ref,
+                <AssetImageElement width="full" alignment="center" />,
+              );
+            }
+          }}
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+        >
+          Image
         </Button>
         <Button
           ref={(ref) => {
@@ -122,6 +139,19 @@ export const SlimToolbox = () => {
         tooltip={<p>Button</p>}
       />
       <SlimToolboxButton
+        icon={<MdOutlineImage />}
+        ariaLabel="Add image"
+        onCreate={(ref) => {
+          if (ref) {
+            connectors.create(
+              ref,
+              <AssetImageElement width="full" alignment="center" />,
+            );
+          }
+        }}
+        tooltip={<p>Image</p>}
+      />
+      <SlimToolboxButton
         icon={<CgSpaceBetweenV />}
         ariaLabel="Add spacer"
         onCreate={(ref) => {
@@ -134,6 +164,33 @@ export const SlimToolbox = () => {
     </Surface>
   );
 };
+
+export function useInsertAssetImage() {
+  const { actions, query } = useEditor();
+
+  return (asset: Asset) => {
+    const nodes = query.getNodes();
+    const rootCanvasNode = Object.values(nodes).find(
+      (node) => node.data.name === "RootCanvas",
+    );
+    const contentNodeId = rootCanvasNode?.data.linkedNodes?.["blog-content"];
+
+    if (!contentNodeId) return;
+
+    const element = (
+      <AssetImageElement
+        assetUuid={asset.uuid}
+        url={asset.media?.url}
+        alt={asset.media?.file_name?.replace(/\.[^.]+$/, "") ?? ""}
+        width="full"
+        alignment="center"
+      />
+    );
+
+    const tree = query.parseReactElement(element).toNodeTree();
+    actions.addNodeTree(tree, contentNodeId);
+  };
+}
 
 const SlimToolboxButton = ({
   icon,

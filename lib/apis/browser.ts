@@ -1,4 +1,5 @@
 import { createBrowserFetcher } from "./fetchers/browser";
+import { createAssetApi } from "./modules/assets";
 import { createAuthApi } from "./modules/auth";
 import { createBlogApi } from "./modules/blogs";
 
@@ -12,3 +13,4 @@ const fetcher = createBrowserFetcher();
 
 export const authApi = createAuthApi(fetcher);
 export const blogApi = createBlogApi(fetcher);
+export const assetApi = createAssetApi(fetcher);

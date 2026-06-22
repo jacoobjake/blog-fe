@@ -9,6 +9,7 @@ import {
   BlogHeaderElement,
   RootCanvas,
   SpacerElement,
+  AssetImageElement,
 } from "./elements";
 import { Topbar } from "./toolbars/topbar";
 import { ReactNode, useState } from "react";
@@ -141,6 +142,7 @@ function EditorContainer({ enabled, children }: { enabled: boolean, children: Re
       BlogHeaderElement,
       RootCanvas,
       SpacerElement,
+      AssetImageElement,
     }}
     enabled={enabled}
     onRender={RenderNode}
