@@ -198,6 +198,10 @@ function EditorContent({
         props.description = blog.description;
       }
 
+      if (blog.created_at) {
+        props.created_at = blog.created_at;
+      }
+
       if (blog.hero_asset?.media?.url) {
         props.hero_asset_uuid = blog.hero_asset.uuid;
         props.hero_src = blog.hero_asset.media.url;

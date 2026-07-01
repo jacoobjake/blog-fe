@@ -2,9 +2,10 @@
 
 import { useEditor, useNode, UserComponent } from "@craftjs/core";
 import { cn } from "@heroui/react";
+import { useEffect } from "react";
+import { ClientDateTime } from "@/components/ui/client-datetime";
 import { BlogHeaderSettings } from "./settings";
 import type { BlogHeaderElementProps } from "./types";
-import { dateToDatetimeString } from "@/lib/utils/date";
 
 export type { BlogHeaderElementProps } from "./types";
 
@@ -13,7 +14,7 @@ const defaultProps: Partial<BlogHeaderElementProps> = {
   description: "",
   author: "Anonymous",
   tags: [],
-  created_at: new Date(),
+  created_at: "",
   hero_object_position: "50% 50%",
 };
 
@@ -29,11 +30,20 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
 }) => {
   const {
     connectors: { connect },
+    actions: { setProp },
   } = useNode();
 
   const { enabled } = useEditor((state) => ({
     enabled: state.options.enabled
   }));
+
+  useEffect(() => {
+    if (!created_at && enabled) {
+      setProp((props: BlogHeaderElementProps) => {
+        props.created_at = new Date().toISOString();
+      });
+    }
+  }, [created_at, enabled, setProp]);
 
   return (
     <header
@@ -64,9 +74,11 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
       <div className="flex items-center gap-4 text-sm text-muted mb-2">
         <span>By {author}</span>
       </div>
-      <div className="flex items-center gap-4 text-xs text-muted/70 mb-2">
-        <span>{dateToDatetimeString(created_at)}</span>
-      </div>
+      {created_at && (
+        <div className="flex items-center gap-4 text-xs text-muted/70 mb-2">
+          <ClientDateTime date={created_at} />
+        </div>
+      )}
       {tags && tags.length > 0 && (
         <div className="flex gap-1">
           {tags.map((tag, index) => (
