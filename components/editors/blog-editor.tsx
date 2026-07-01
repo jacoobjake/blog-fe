@@ -1,6 +1,7 @@
 "use client";
 
 import { Blog, BlogContentType } from "@/lib/types";
+import type { BlogHeaderElementProps } from "./elements/blog-header/types";
 import { Editor, Frame, useEditor } from "@craftjs/core";
 import {
   TextElement,
@@ -9,9 +10,10 @@ import {
   BlogHeaderElement,
   RootCanvas,
   SpacerElement,
+  ImageElement,
 } from "./elements";
 import { Topbar } from "./toolbars/topbar";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBlogAction, updateBlogAction } from "@/lib/actions";
 import lz from "lz-string";
@@ -65,37 +67,35 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
       );
 
       const title = blogHeaderNode?.data.props.title || "";
+      const description = blogHeaderNode?.data.props.description || "";
       const author = blogHeaderNode?.data.props.author || "";
       const tags = blogHeaderNode?.data.props.tags || [];
       const is_published = blogHeaderNode?.data.props.is_published || false;
+      const hero_asset_uuid =
+        blogHeaderNode?.data.props.hero_asset_uuid || null;
 
       // Compress the JSON content
       const compressed = lz.compressToBase64(json);
 
+      const payload = {
+        title: title.trim(),
+        description: description.trim() || null,
+        author: author.trim(),
+        json_content: {
+          type: BlogContentType.CompressedBase64,
+          body: compressed,
+        },
+        hero_asset_uuid,
+        is_published: is_published,
+        tags: tags.filter((tag: string) => tag.trim() !== ""),
+      };
+
       if (blog?.slug) {
         // Update existing blog
-        await updateBlogAction(blog.slug, {
-          title: title.trim(),
-          author: author.trim(),
-          json_content: {
-            type: BlogContentType.CompressedBase64,
-            body: compressed,
-          },
-          is_published: is_published,
-          tags: tags.filter((tag: string) => tag.trim() !== ""),
-        });
+        await updateBlogAction(blog.slug, payload);
       } else {
         // Create new blog
-        const response = await createBlogAction({
-          title: title.trim(),
-          author: author.trim(),
-          json_content: {
-            type: BlogContentType.CompressedBase64,
-            body: compressed,
-          },
-          is_published: is_published,
-          tags: tags.filter((tag: string) => tag.trim() !== ""),
-        });
+        const response = await createBlogAction(payload);
 
         // Redirect to the newly created blog editor
         router.push(`/admin/editor/blogs?slug=${response.slug}`);
@@ -141,6 +141,7 @@ function EditorContainer({ enabled, children }: { enabled: boolean, children: Re
       BlogHeaderElement,
       RootCanvas,
       SpacerElement,
+      ImageElement,
     }}
     enabled={enabled}
     onRender={RenderNode}
@@ -177,6 +178,31 @@ function EditorContent({
   const { query, actions } = useEditor();
   const user = useAuthStore((s) => s.user ?? undefined);
   const title = useBlogHeaderTitle();
+
+  useEffect(() => {
+    if (!blog) return;
+
+    const nodes = query.getNodes();
+    const blogHeaderEntry = Object.entries(nodes).find(
+      ([, node]) => node.data.name === "BlogHeaderElement",
+    );
+
+    if (!blogHeaderEntry) return;
+
+    const [nodeId] = blogHeaderEntry;
+
+    actions.setProp(nodeId, (props: BlogHeaderElementProps) => {
+      if (blog.description) {
+        props.description = blog.description;
+      }
+
+      if (blog.hero_asset?.media?.url) {
+        props.hero_asset_uuid = blog.hero_asset.uuid;
+        props.hero_src = blog.hero_asset.media.url;
+        props.hero_object_position = props.hero_object_position ?? "50% 50%";
+      }
+    });
+  }, [actions, blog, query]);
 
   const handleFinishClick = () => {
     onFinish(query, actions);

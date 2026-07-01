@@ -5,8 +5,13 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { BlogHeaderSchema } from "@/lib/schemas/blog";
-import { Surface, TextField, Label, Input, Checkbox } from "@heroui/react";
+import { Surface, TextField, Label, Input, Checkbox, Button } from "@heroui/react";
 import TagsField from "@/components/forms/fields/tags-field";
+import {
+  AssetManagerModal,
+  useAssetManagerModal,
+} from "@/components/editors/asset-manager";
+import { ImagePositionPicker } from "@/components/editors/asset-manager/image-position-picker";
 import type { BlogHeaderElementProps } from "./types";
 
 export const BlogHeaderSettings = () => {
@@ -16,6 +21,8 @@ export const BlogHeaderSettings = () => {
     author,
     is_published,
     tags,
+    hero_src,
+    hero_object_position,
     actions: { setProp },
   } = useNode((node) => ({
     title: node.data.props.title as string,
@@ -23,7 +30,13 @@ export const BlogHeaderSettings = () => {
     author: node.data.props.author as string,
     is_published: node.data.props.is_published as boolean,
     tags: node.data.props.tags as string[],
+    hero_src: node.data.props.hero_src as string | undefined,
+    hero_object_position: node.data.props.hero_object_position as
+      | string
+      | undefined,
   }));
+
+  const heroModal = useAssetManagerModal();
 
   const {
     control,
@@ -86,6 +99,52 @@ export const BlogHeaderSettings = () => {
             />
           </TextField>
         )}
+      />
+
+      <div className="space-y-2">
+        <Label>Hero image</Label>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onPress={heroModal.open}>
+            {hero_src ? "Change hero image" : "Choose hero image"}
+          </Button>
+          {hero_src && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onPress={() =>
+                setProp((props: BlogHeaderElementProps) => {
+                  props.hero_asset_uuid = undefined;
+                  props.hero_src = undefined;
+                })
+              }
+            >
+              Remove
+            </Button>
+          )}
+        </div>
+        {hero_src && (
+          <ImagePositionPicker
+            src={hero_src}
+            value={hero_object_position ?? "50% 50%"}
+            onChange={(position) =>
+              setProp((props: BlogHeaderElementProps) => {
+                props.hero_object_position = position;
+              })
+            }
+          />
+        )}
+      </div>
+
+      <AssetManagerModal
+        isOpen={heroModal.isOpen}
+        onOpenChange={heroModal.setOpen}
+        onSelect={(asset) =>
+          setProp((props: BlogHeaderElementProps) => {
+            props.hero_asset_uuid = asset.uuid;
+            props.hero_src = asset.media?.url;
+            props.hero_object_position = props.hero_object_position ?? "50% 50%";
+          })
+        }
       />
 
       <Controller

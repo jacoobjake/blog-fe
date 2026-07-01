@@ -2,6 +2,7 @@ import { createAuthApi } from "../modules/auth";
 import { createGraphqlClient } from "../modules/graphql";
 import { createNextServerFetcher } from "../fetchers/next-server";
 import { createBlogApi } from "../modules/blogs";
+import { createAssetApi } from "../modules/assets";
 
 type ServerApiConfig = {
   baseUrl?: string;
@@ -23,6 +24,7 @@ export async function getServerApi(config?: ServerApiConfig) {
     graphql: createGraphqlClient(fetcher),
     auth: createAuthApi(fetcher),
     blogs: createBlogApi(fetcher),
+    assets: createAssetApi(fetcher),
   };
 }
 
@@ -36,4 +38,8 @@ export async function getServerAuthApi(config?: ServerApiConfig) {
 
 export async function getServerBlogApi(config?: ServerApiConfig) {
   return createBlogApi(await createNextServerFetcher(config));
+}
+
+export async function getServerAssetApi(config?: ServerApiConfig) {
+  return createAssetApi(await createNextServerFetcher(config));
 }

@@ -20,6 +20,20 @@ type BlogListQueryVariables = {
  *
  * Callers can pass either a browser fetcher or a server fetcher.
  */
+const heroAssetFields = `
+  hero_asset {
+    uuid
+    type
+    media {
+      file_name
+      mime_type
+      url
+      thumbnail_100
+      thumbnail_200
+    }
+  }
+`;
+
 export function createBlogApi(fetcher: ApiFetcher) {
   const gql = createGraphqlClient(fetcher);
   const { post, put, del } = createHttpMethods(fetcher);
@@ -30,8 +44,10 @@ export function createBlogApi(fetcher: ApiFetcher) {
             data {
                 slug
                 title
+                description
                 author
                 is_published
+                ${heroAssetFields}
                 created_at
                 updated_at
             }
@@ -55,10 +71,12 @@ export function createBlogApi(fetcher: ApiFetcher) {
         data {
           slug
           title
+          description
           author
           tags {
             name
           }
+          ${heroAssetFields}
           created_at
           updated_at
         }
@@ -101,9 +119,11 @@ export function createBlogApi(fetcher: ApiFetcher) {
       blog(slug: $slug) {
         slug
         title
+        description
         author
         json_content
         is_published
+        ${heroAssetFields}
         tags {
           name
         }
@@ -118,9 +138,11 @@ export function createBlogApi(fetcher: ApiFetcher) {
       blogPublic(slug: $slug) {
         slug
         title
+        description
         author
         json_content
         is_published
+        ${heroAssetFields}
         tags {
           name
         }

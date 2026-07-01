@@ -1,6 +1,7 @@
 import { createBrowserFetcher } from "./fetchers/browser";
 import { createAuthApi } from "./modules/auth";
 import { createBlogApi } from "./modules/blogs";
+import { createAssetApi } from "./modules/assets";
 
 /**
  * Singleton browser fetcher — created once per page session.
@@ -12,3 +13,4 @@ const fetcher = createBrowserFetcher();
 
 export const authApi = createAuthApi(fetcher);
 export const blogApi = createBlogApi(fetcher);
+export const assetApi = createAssetApi(fetcher);

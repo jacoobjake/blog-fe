@@ -14,6 +14,7 @@ const defaultProps: Partial<BlogHeaderElementProps> = {
   author: "Anonymous",
   tags: [],
   created_at: new Date(),
+  hero_object_position: "50% 50%",
 };
 
 export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
@@ -23,6 +24,8 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
   is_published,
   tags = [],
   created_at,
+  hero_src,
+  hero_object_position = "50% 50%",
 }) => {
   const {
     connectors: { connect },
@@ -39,6 +42,16 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
       }}
       className={cn("mb-8 pb-6 border-b border-separator")}
     >
+      {hero_src && (
+        <div className="w-full aspect-[21/9] overflow-hidden rounded-xl mb-6">
+          <img
+            src={hero_src}
+            alt={title}
+            className="w-full h-full object-cover"
+            style={{ objectPosition: hero_object_position }}
+          />
+        </div>
+      )}
       <div className="flex items-center justify-between mb-2">
         <h1 className="text-4xl font-bold">{title}</h1>
         {enabled && is_published && (

@@ -12,6 +12,4 @@ export type Asset = {
     thumbnail_100: string;
     thumbnail_200: string;
   };
-  created_at: string;
-  updated_at: string;
 };

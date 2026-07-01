@@ -28,7 +28,9 @@ export type BlogHeaderDto = z.output<typeof BlogHeaderSchema>;
 
 export const CreateBlogSchema = z.object({
   title: z.string().max(255),
+  description: z.string().nullable().optional(),
   json_content: JsonContentSchema,
+  hero_asset_uuid: z.string().uuid().nullable().optional(),
   author: z.string().max(255),
   is_published: z.boolean().default(false),
   tags: z.array(z.string()).nullable(),
