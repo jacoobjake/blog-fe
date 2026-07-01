@@ -6,4 +6,6 @@ export type ImageElementProps = {
   objectPosition?: string;
   height?: number;
   scale?: number;
+  intrinsicWidth?: number;
+  intrinsicHeight?: number;
 };

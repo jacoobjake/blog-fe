@@ -9,6 +9,8 @@ type ImagePositionPickerProps = {
   value?: string;
   height?: number;
   scale?: number;
+  intrinsicWidth?: number;
+  intrinsicHeight?: number;
   onChange: (position: string) => void;
 };
 
@@ -22,6 +24,8 @@ export function ImagePositionPicker({
   value = "50% 50%",
   height = 280,
   scale = 1,
+  intrinsicWidth,
+  intrinsicHeight,
   onChange,
 }: ImagePositionPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -84,6 +88,8 @@ export function ImagePositionPicker({
           height={height}
           objectPosition={value}
           scale={scale}
+          intrinsicWidth={intrinsicWidth}
+          intrinsicHeight={intrinsicHeight}
           className="rounded-lg pointer-events-none"
         />
         <span

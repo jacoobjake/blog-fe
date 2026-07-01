@@ -25,6 +25,8 @@ export const ImageElement = ({
   objectPosition = "50% 50%",
   height = DEFAULT_HEIGHT,
   scale = DEFAULT_SCALE,
+  intrinsicWidth,
+  intrinsicHeight,
 }: ImageElementProps) => {
   const {
     connectors: { connect, drag },
@@ -51,6 +53,8 @@ export const ImageElement = ({
           height={containerHeight}
           objectPosition={objectPosition}
           scale={scale ?? DEFAULT_SCALE}
+          intrinsicWidth={intrinsicWidth}
+          intrinsicHeight={intrinsicHeight}
           className="rounded-lg"
         />
       ) : (
@@ -78,6 +82,8 @@ ImageElement.craft = {
     objectPosition: "50% 50%",
     height: DEFAULT_HEIGHT,
     scale: DEFAULT_SCALE,
+    intrinsicWidth: undefined,
+    intrinsicHeight: undefined,
   },
   related: {
     settings: ImageElementSettings,

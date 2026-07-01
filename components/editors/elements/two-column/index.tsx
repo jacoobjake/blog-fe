@@ -2,7 +2,6 @@
 
 import { Element, useEditor, useNode, UserComponent } from "@craftjs/core";
 import { cn } from "@heroui/react";
-import { useRef } from "react";
 import { ContainerElement } from "../container";
 import { ColumnResizeHandle } from "./column-resize-handle";
 import { TwoColumnSettings } from "./settings";
@@ -13,7 +12,6 @@ export type { TwoColumnElementProps } from "./types";
 export const TwoColumnElement: UserComponent<TwoColumnElementProps> = ({
   leftWidthPercent = 50,
 }) => {
-  const rowRef = useRef<HTMLDivElement>(null);
   const {
     connectors: { connect, drag },
   } = useNode();
@@ -23,6 +21,7 @@ export const TwoColumnElement: UserComponent<TwoColumnElementProps> = ({
   }));
 
   const clampedLeft = Math.min(80, Math.max(20, leftWidthPercent));
+  const rightWidthPercent = 100 - clampedLeft;
 
   return (
     <div
@@ -33,21 +32,23 @@ export const TwoColumnElement: UserComponent<TwoColumnElementProps> = ({
       style={
         {
           "--left-col": `${clampedLeft}%`,
+          "--right-col": `${rightWidthPercent}%`,
         } as React.CSSProperties
       }
     >
       <div
-        ref={rowRef}
         className={cn(
-          "relative w-full",
-          "flex flex-col md:flex-row md:items-stretch",
+          "flex gap-0",
+          "flex-col md:flex-row md:items-stretch",
         )}
       >
         <div className="min-w-0 w-full md:w-[var(--left-col)] md:flex-none">
           <Element id="left-column" is={ContainerElement} padding={16} canvas />
         </div>
 
-        <div className="min-w-0 w-full md:flex-1">
+        {enabled && <ColumnResizeHandle />}
+
+        <div className="min-w-0 w-full md:w-[var(--right-col)] md:flex-none">
           <Element
             id="right-column"
             is={ContainerElement}
@@ -55,10 +56,6 @@ export const TwoColumnElement: UserComponent<TwoColumnElementProps> = ({
             canvas
           />
         </div>
-
-        {enabled && (
-          <ColumnResizeHandle rowRef={rowRef} leftPercent={clampedLeft} />
-        )}
       </div>
     </div>
   );

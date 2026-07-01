@@ -15,8 +15,8 @@ import {
   MdOutlineTouchApp,
   MdTextFields,
   MdOutlineImage,
-  MdViewColumn,
 } from "react-icons/md";
+import { LuColumns2 } from "react-icons/lu";
 import { CgSpaceBetweenV } from "react-icons/cg";
 
 export const Toolbox = () => {
@@ -169,7 +169,7 @@ export const SlimToolbox = () => {
         tooltip={<p>Image</p>}
       />
       <SlimToolboxButton
-        icon={<MdViewColumn />}
+        icon={<LuColumns2 />}
         ariaLabel="Add two columns"
         onCreate={(ref) => {
           if (ref) {
