@@ -7,13 +7,16 @@ import {
   ContainerElement,
   TextElement,
   SpacerElement,
+  ImageElement,
+  TwoColumnElement,
 } from "../elements";
 import {
   MdOutlineRectangle,
   MdOutlineTouchApp,
   MdTextFields,
+  MdOutlineImage,
 } from "react-icons/md";
-import { LuBlocks } from "react-icons/lu";
+import { LuColumns2 } from "react-icons/lu";
 import { CgSpaceBetweenV } from "react-icons/cg";
 
 export const Toolbox = () => {
@@ -76,6 +79,30 @@ export const Toolbox = () => {
         >
           Spacer
         </Button>
+        <Button
+          ref={(ref) => {
+            if (ref) {
+              connectors.create(ref, <ImageElement />);
+            }
+          }}
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+        >
+          Image
+        </Button>
+        <Button
+          ref={(ref) => {
+            if (ref) {
+              connectors.create(ref, <TwoColumnElement />);
+            }
+          }}
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+        >
+          Two Columns
+        </Button>
       </div>
     </Surface>
   );
@@ -130,6 +157,26 @@ export const SlimToolbox = () => {
           }
         }}
         tooltip={<p>Spacer</p>}
+      />
+      <SlimToolboxButton
+        icon={<MdOutlineImage />}
+        ariaLabel="Add image"
+        onCreate={(ref) => {
+          if (ref) {
+            connectors.create(ref, <ImageElement />);
+          }
+        }}
+        tooltip={<p>Image</p>}
+      />
+      <SlimToolboxButton
+        icon={<LuColumns2 />}
+        ariaLabel="Add two columns"
+        onCreate={(ref) => {
+          if (ref) {
+            connectors.create(ref, <TwoColumnElement />);
+          }
+        }}
+        tooltip={<p>Two Columns</p>}
       />
     </Surface>
   );

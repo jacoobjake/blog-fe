@@ -1,4 +1,4 @@
-import { DEFAULT_INTL_OPTIONS } from "@/constants";
+import { DEFAULT_INTL_OPTIONS, DEFAULT_TIME_INTL_OPTIONS } from "@/constants";
 
 type DateInput = Date | string | number;
 
@@ -13,5 +13,5 @@ export function dateToDateString(date: DateInput) {
 
 export function dateToDatetimeString(date: DateInput) {
     const value = toDate(date);
-    return `${dateToDateString(value)} ${value.toLocaleTimeString()} `;
+    return `${dateToDateString(value)} ${value.toLocaleTimeString(undefined, DEFAULT_TIME_INTL_OPTIONS)}`;
 }

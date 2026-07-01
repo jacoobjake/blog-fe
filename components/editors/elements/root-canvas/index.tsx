@@ -32,7 +32,6 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ user, children }) =
         author={user?.name || "Anonymous"}
         is_published={false}
         tags={[]}
-        created_at={new Date()}
       />
 
       {/* Content area */}
