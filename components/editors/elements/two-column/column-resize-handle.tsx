@@ -61,10 +61,10 @@ export function ColumnResizeHandle() {
       role="separator"
       aria-orientation="vertical"
       aria-label="Resize columns"
-      className="hidden md:flex w-3 shrink-0 cursor-col-resize items-center justify-center group"
+      className="hidden md:block relative w-3 shrink-0 self-stretch cursor-col-resize group"
       onPointerDown={handlePointerDown}
     >
-      <div className="h-16 w-1 rounded-full bg-separator group-hover:bg-accent transition-colors" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-16 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-separator group-hover:bg-accent transition-colors" />
     </div>
   );
 }
