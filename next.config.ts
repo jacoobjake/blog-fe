@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
-function getApiImageRemotePattern() {
+function getApiImageRemotePatterns() {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   if (!apiBaseUrl) return [];
 
   try {
     const url = new URL(apiBaseUrl);
-    return [
+    const patterns = [
       {
         protocol: url.protocol.replace(":", "") as "http" | "https",
         hostname: url.hostname,
@@ -14,6 +14,17 @@ function getApiImageRemotePattern() {
         pathname: "/storage/**",
       },
     ];
+
+    if (url.hostname === "localhost" && url.port) {
+      patterns.push({
+        protocol: url.protocol.replace(":", "") as "http" | "https",
+        hostname: url.hostname,
+        port: undefined,
+        pathname: "/storage/**",
+      });
+    }
+
+    return patterns;
   } catch {
     return [];
   }
@@ -22,7 +33,7 @@ function getApiImageRemotePattern() {
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
-    remotePatterns: getApiImageRemotePattern(),
+    remotePatterns: getApiImageRemotePatterns(),
   },
 };
 

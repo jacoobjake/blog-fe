@@ -1,9 +1,7 @@
 import { Blog } from "@/lib/types";
 import { dateToDateString } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
-
-const FALLBACK_THUMBNAIL = "/images/jimmy_sticker.png";
+import { BlogCardThumbnail } from "./blog-card-thumbnail";
 
 export default function BlogListCard({
   blog,
@@ -12,21 +10,14 @@ export default function BlogListCard({
   height?: number;
 }) {
   const createdAt = new Date(blog.created_at);
-  const thumbnail =
-    blog.hero_asset?.media?.thumbnail_200 ??
-    blog.hero_asset?.media?.url ??
-    FALLBACK_THUMBNAIL;
 
   return (
     <Link href={`/blogs/${blog.slug}`}>
       <div className="rounded-xl overflow-hidden shadow-accent/50 hover:shadow-lg transition bg-surface h-96 flex flex-col cursor-pointer">
         <div className="relative h-48 w-full bg-accent/50">
-          <Image
-            src={thumbnail}
+          <BlogCardThumbnail
+            media={blog.hero_asset?.media}
             alt={blog.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
           />
         </div>
         <div className="p-4 flex flex-col justify-between grow">
