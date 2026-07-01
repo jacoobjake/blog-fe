@@ -4,4 +4,6 @@ export type ImageElementProps = {
   alt?: string;
   alignment?: "left" | "center" | "right";
   objectPosition?: string;
+  height?: number;
+  scale?: number;
 };

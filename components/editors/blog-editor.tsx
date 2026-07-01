@@ -11,6 +11,7 @@ import {
   RootCanvas,
   SpacerElement,
   ImageElement,
+  TwoColumnElement,
 } from "./elements";
 import { Topbar } from "./toolbars/topbar";
 import { ReactNode, useEffect, useState } from "react";
@@ -142,6 +143,7 @@ function EditorContainer({ enabled, children }: { enabled: boolean, children: Re
       RootCanvas,
       SpacerElement,
       ImageElement,
+      TwoColumnElement,
     }}
     enabled={enabled}
     onRender={RenderNode}

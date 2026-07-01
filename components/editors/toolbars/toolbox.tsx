@@ -8,12 +8,14 @@ import {
   TextElement,
   SpacerElement,
   ImageElement,
+  TwoColumnElement,
 } from "../elements";
 import {
   MdOutlineRectangle,
   MdOutlineTouchApp,
   MdTextFields,
   MdOutlineImage,
+  MdViewColumn,
 } from "react-icons/md";
 import { CgSpaceBetweenV } from "react-icons/cg";
 
@@ -89,6 +91,18 @@ export const Toolbox = () => {
         >
           Image
         </Button>
+        <Button
+          ref={(ref) => {
+            if (ref) {
+              connectors.create(ref, <TwoColumnElement />);
+            }
+          }}
+          variant="outline"
+          size="sm"
+          className="w-full justify-start"
+        >
+          Two Columns
+        </Button>
       </div>
     </Surface>
   );
@@ -153,6 +167,16 @@ export const SlimToolbox = () => {
           }
         }}
         tooltip={<p>Image</p>}
+      />
+      <SlimToolboxButton
+        icon={<MdViewColumn />}
+        ariaLabel="Add two columns"
+        onCreate={(ref) => {
+          if (ref) {
+            connectors.create(ref, <TwoColumnElement />);
+          }
+        }}
+        tooltip={<p>Two Columns</p>}
       />
     </Surface>
   );

@@ -6,6 +6,8 @@ import { Label } from "@heroui/react";
 type ImagePositionPickerProps = {
   src: string;
   value?: string;
+  height?: number;
+  scale?: number;
   onChange: (position: string) => void;
 };
 
@@ -17,10 +19,13 @@ function parsePosition(value?: string) {
 export function ImagePositionPicker({
   src,
   value = "50% 50%",
+  height = 280,
+  scale = 1,
   onChange,
 }: ImagePositionPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { x, y } = parsePosition(value);
+  const imageScale = Math.min(3, Math.max(0.5, scale));
 
   const updatePosition = (clientX: number, clientY: number) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -46,7 +51,8 @@ export function ImagePositionPicker({
       </p>
       <div
         ref={containerRef}
-        className="relative w-full aspect-[21/9] overflow-hidden rounded-lg border border-separator cursor-crosshair select-none"
+        className="relative w-full overflow-hidden rounded-lg border border-separator cursor-crosshair select-none"
+        style={{ height }}
         onPointerDown={(e) => {
           containerRef.current?.setPointerCapture(e.pointerId);
           updatePosition(e.clientX, e.clientY);
@@ -63,7 +69,11 @@ export function ImagePositionPicker({
           src={src}
           alt="Position preview"
           className="w-full h-full object-cover pointer-events-none"
-          style={{ objectPosition: value }}
+          style={{
+            objectPosition: value,
+            transform: `scale(${imageScale})`,
+            transformOrigin: value,
+          }}
           draggable={false}
         />
         <span
