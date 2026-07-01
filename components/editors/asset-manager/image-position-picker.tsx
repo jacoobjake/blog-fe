@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Label } from "@heroui/react";
+import { ImageFrame } from "@/components/editors/shared/image-frame";
 
 type ImagePositionPickerProps = {
   src: string;
@@ -25,7 +26,6 @@ export function ImagePositionPicker({
 }: ImagePositionPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { x, y } = parsePosition(value);
-  const imageScale = Math.min(3, Math.max(0.5, scale));
 
   const updatePosition = (clientX: number, clientY: number) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -51,30 +51,40 @@ export function ImagePositionPicker({
       </p>
       <div
         ref={containerRef}
-        className="relative w-full overflow-hidden rounded-lg border border-separator cursor-crosshair select-none"
+        className="relative w-full rounded-lg border border-separator cursor-crosshair select-none"
         style={{ height }}
         onPointerDown={(e) => {
-          containerRef.current?.setPointerCapture(e.pointerId);
+          const container = containerRef.current;
+          if (!container) return;
+
+          const pointerId = e.pointerId;
+          container.setPointerCapture(pointerId);
           updatePosition(e.clientX, e.clientY);
-        }}
-        onPointerMove={(e) => {
-          if (!containerRef.current?.hasPointerCapture(e.pointerId)) return;
-          updatePosition(e.clientX, e.clientY);
-        }}
-        onPointerUp={(e) => {
-          containerRef.current?.releasePointerCapture(e.pointerId);
+
+          const handlePointerMove = (moveEvent: PointerEvent) => {
+            if (!container.hasPointerCapture(pointerId)) return;
+            updatePosition(moveEvent.clientX, moveEvent.clientY);
+          };
+
+          const handlePointerUp = () => {
+            if (container.hasPointerCapture(pointerId)) {
+              container.releasePointerCapture(pointerId);
+            }
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+          };
+
+          window.addEventListener("pointermove", handlePointerMove);
+          window.addEventListener("pointerup", handlePointerUp);
         }}
       >
-        <img
+        <ImageFrame
           src={src}
           alt="Position preview"
-          className="w-full h-full object-cover pointer-events-none"
-          style={{
-            objectPosition: value,
-            transform: `scale(${imageScale})`,
-            transformOrigin: value,
-          }}
-          draggable={false}
+          height={height}
+          objectPosition={value}
+          scale={scale}
+          className="rounded-lg pointer-events-none"
         />
         <span
           className="absolute w-4 h-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-md bg-accent/80 pointer-events-none"

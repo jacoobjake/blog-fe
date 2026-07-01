@@ -2,6 +2,7 @@
 
 import { useEditor, useNode } from "@craftjs/core";
 import { cn } from "@heroui/react";
+import { ImageFrame } from "@/components/editors/shared/image-frame";
 import { ImageElementSettings } from "./settings";
 import type { ImageElementProps } from "./types";
 
@@ -34,7 +35,6 @@ export const ImageElement = ({
   }));
 
   const containerHeight = Math.max(80, height ?? DEFAULT_HEIGHT);
-  const imageScale = Math.min(3, Math.max(0.5, scale ?? DEFAULT_SCALE));
 
   return (
     <div
@@ -42,24 +42,17 @@ export const ImageElement = ({
         if (ref) connect(drag(ref));
       }}
       className={cn("w-full my-4", alignmentClassNames[alignment])}
+      data-asset-uuid={assetUuid}
     >
       {src ? (
-        <div
-          className="w-full rounded-lg overflow-hidden"
-          style={{ height: containerHeight }}
-        >
-          <img
-            src={src}
-            alt={alt || "Blog image"}
-            className="w-full h-full object-cover"
-            style={{
-              objectPosition,
-              transform: `scale(${imageScale})`,
-              transformOrigin: objectPosition,
-            }}
-            data-asset-uuid={assetUuid}
-          />
-        </div>
+        <ImageFrame
+          src={src}
+          alt={alt || "Blog image"}
+          height={containerHeight}
+          objectPosition={objectPosition}
+          scale={scale ?? DEFAULT_SCALE}
+          className="rounded-lg"
+        />
       ) : (
         <div
           className={cn(
@@ -76,7 +69,7 @@ export const ImageElement = ({
 };
 
 ImageElement.craft = {
-  displayName: "ImageElement",
+  displayName: "Image",
   props: {
     assetUuid: undefined,
     src: undefined,
