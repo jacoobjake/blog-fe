@@ -1,23 +1,31 @@
 "use client";
 
-import { CreateBlogSchema } from "@/lib/schemas/blog";
+import { UpdateBlogMetadataDto, UpdateBlogMetadataSchema } from "@/lib/schemas/blog";
 import { Blog } from "@/lib/types";
-import { FieldError, Form, Input, Key, Label, TextField } from "@heroui/react";
+import { formatError } from "@/lib/utils/api-error";
+import {
+  ErrorMessage,
+  FieldError,
+  Form,
+  Input,
+  Label,
+  TextField,
+} from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import TagsField from "../fields/tags-field";
 
-type BlogDetailsFormProps =
-  | {
-      type: "create";
-      blog: undefined;
-    }
-  | {
-      type: "edit";
-      blog: Blog;
-    };
+type BlogDetailsFormProps = {
+  blog: Blog;
+  formId?: string;
+  onSubmit: (data: UpdateBlogMetadataDto) => Promise<void>;
+};
 
-export default function BlogDetailsForm({ type, blog }: BlogDetailsFormProps) {
+export default function BlogDetailsForm({
+  blog,
+  formId = "blog-details-form",
+  onSubmit,
+}: BlogDetailsFormProps) {
   const {
     control,
     handleSubmit: handleFormSubmit,
@@ -25,18 +33,34 @@ export default function BlogDetailsForm({ type, blog }: BlogDetailsFormProps) {
     setError,
   } = useForm({
     defaultValues: {
-      title: blog?.title || "",
-      json_content: blog?.json_content ?? undefined,
-      author: blog?.author || "",
-      tags: blog?.tags.map((t) => t.name || "") || [],
+      title: blog.title,
+      author: blog.author,
+      description: blog.description ?? "",
+      tags: blog.tags.map((t) => t.name || ""),
     },
-    resolver: zodResolver(CreateBlogSchema),
+    resolver: zodResolver(UpdateBlogMetadataSchema),
   });
 
   const { errors, isSubmitting } = formState;
 
+  const handleSubmit = async (data: UpdateBlogMetadataDto) => {
+    try {
+      await onSubmit(data);
+    } catch (e) {
+      const formatted = formatError(e);
+      setError("root.serverError", {
+        type: formatted.status.toString(),
+        message: formatted.message,
+      });
+    }
+  };
+
   return (
-    <Form className="w-full space-y-4">
+    <Form
+      id={formId}
+      className="w-full max-w-2xl space-y-4"
+      onSubmit={handleFormSubmit(handleSubmit)}
+    >
       <Controller
         name="title"
         control={control}
@@ -68,6 +92,21 @@ export default function BlogDetailsForm({ type, blog }: BlogDetailsFormProps) {
         )}
       />
       <Controller
+        name="description"
+        control={control}
+        render={({ field, fieldState }) => (
+          <TextField
+            isInvalid={fieldState.invalid}
+            aria-label="Description"
+            type="text"
+          >
+            <Label>Description</Label>
+            <Input {...field} value={field.value ?? ""} />
+            <FieldError>{fieldState.error?.message}</FieldError>
+          </TextField>
+        )}
+      />
+      <Controller
         name="tags"
         control={control}
         render={({ field, fieldState }) => (
@@ -82,6 +121,16 @@ export default function BlogDetailsForm({ type, blog }: BlogDetailsFormProps) {
           />
         )}
       />
+
+      {errors.root?.serverError && (
+        <p>
+          <ErrorMessage>{errors.root.serverError.message}</ErrorMessage>
+        </p>
+      )}
+
+      <button type="submit" className="sr-only" disabled={isSubmitting}>
+        Save
+      </button>
     </Form>
   );
 }

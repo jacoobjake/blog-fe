@@ -2,6 +2,7 @@ import { Blog } from "@/lib/types";
 import { dateToDateString } from "@/lib/utils";
 import Link from "next/link";
 import { BlogCardThumbnail } from "./blog-card-thumbnail";
+import BlogTagList from "@/components/blogs/blog-tag-list";
 
 export default function BlogListCard({
   blog,
@@ -30,6 +31,7 @@ export default function BlogListCard({
                 {blog.description}
               </p>
             )}
+            <BlogTagList tags={blog.tags ?? []} className="mt-3" />
           </div>
           <div>
             <p>{blog.author}</p>

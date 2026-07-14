@@ -1,7 +1,6 @@
-import OpenEditorButton from "@/components/editors/open-editor-btn";
-import { BlogDetailsForm } from "@/components/forms/blogs";
 import { BackButton } from "@/components/nav";
 import { AdminPage } from "@/components/ui/containers";
+import BlogDetailsPageContent from "@/components/forms/blogs/blog-details-page-content";
 import { getServerBlogApi } from "@/lib/apis/server";
 
 export default async function BlogDetailsPage({
@@ -15,8 +14,7 @@ export default async function BlogDetailsPage({
   return (
     <AdminPage title="Blog Details">
       <BackButton href="/admin/blogs" data-slot="pre-action" />
-      <OpenEditorButton slug={slug} data-slot="extra-actions" />
-      <BlogDetailsForm type="edit" blog={blog} />
+      <BlogDetailsPageContent blog={blog} />
     </AdminPage>
   );
 }

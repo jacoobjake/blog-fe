@@ -41,3 +41,20 @@ export type CreateBlogDto = z.infer<typeof CreateBlogSchema>;
 export const UpdateBlogSchema = CreateBlogSchema;
 
 export type UpdateBlogDto = z.infer<typeof UpdateBlogSchema>;
+
+export const UpdateBlogMetadataSchema = z.object({
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(255, "Title must be less than 255 characters"),
+  author: z
+    .string()
+    .min(1, "Author is required")
+    .max(255, "Author must be less than 255 characters"),
+  description: z.string().nullable().optional(),
+  tags: z
+    .array(z.string().max(255, "Each tag must be less than 255 characters"))
+    .default([]),
+});
+
+export type UpdateBlogMetadataDto = z.infer<typeof UpdateBlogMetadataSchema>;

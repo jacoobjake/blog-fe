@@ -1,48 +1,114 @@
 "use client";
 
+import BlogFilters from "@/components/blogs/blog-filters";
+import PublicTagBrowse from "@/components/blogs/public-tag-browse";
 import { blogApi } from "@/lib/apis";
+import {
+  parseTagsInput,
+  toLikePattern,
+  type BlogListFilters,
+} from "@/lib/utils/blog-filters";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import BlogListCard from "./blog-list-card";
 import { PaginationState } from "@tanstack/react-table";
 import { Separator } from "@heroui/react";
 import StandardPagination from "@/components/ui/nav/standard-pagination";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 export default function PublicBlogList() {
-    const [paginationState, setPaginationState] = useState<PaginationState>({
-        pageIndex: 0,
-        pageSize: 12,
-    });
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [paginationState, setPaginationState] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 12,
+  });
 
-    const { data } = useQuery({
-        queryKey: ["public-blogs", paginationState],
-        queryFn: async () => {
-            const data = await blogApi.listPublicBlogs({
-                first: paginationState.pageSize,
-                page: paginationState.pageIndex + 1,
-            });
-            return data;
-        },
-        placeholderData: keepPreviousData,
-    });
+  const filters = useMemo<BlogListFilters>(() => {
+    const title = searchParams.get("title");
+    const author = searchParams.get("author");
+    const tag = searchParams.get("tag");
 
-    const totalPages = data?.paginatorInfo.lastPage ?? 1;
+    return {
+      title: title ? toLikePattern(title) : undefined,
+      author: author ? toLikePattern(author) : undefined,
+      tags: tag ? parseTagsInput(tag) : undefined,
+    };
+  }, [searchParams]);
 
-    const setPageIndex = useCallback((pageIndex: number) => {
-        setPaginationState((prev) => ({ ...prev, pageIndex }))
-    }, [setPaginationState])
+  const queryVariables = useMemo(
+    () => ({
+      pagination: paginationState,
+      filters,
+    }),
+    [filters, paginationState],
+  );
 
-    return (
-        <div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-4">
-                {
-                    data?.data?.map((blog) => <BlogListCard key={blog.slug} blog={blog} />)
-                }
-            </div>
-            <Separator className="my-8" />
-            <div className="w-full flex justify-center">
-                <StandardPagination page={paginationState.pageIndex + 1} totalPages={totalPages} setPage={(page) => setPageIndex(page - 1)} />
-            </div>
-        </div>
-    );
+  const { data } = useQuery({
+    queryKey: ["public-blogs", queryVariables],
+    queryFn: async () => {
+      const data = await blogApi.listPublicBlogs({
+        first: paginationState.pageSize,
+        page: paginationState.pageIndex + 1,
+        title: filters.title,
+        author: filters.author,
+        tags: filters.tags,
+        orderBy: [{ column: "created_at", order: "DESC" }],
+      });
+      return data;
+    },
+    placeholderData: keepPreviousData,
+  });
+
+  const totalPages = data?.paginatorInfo.lastPage ?? 1;
+
+  const setPageIndex = useCallback((pageIndex: number) => {
+    setPaginationState((prev) => ({ ...prev, pageIndex }));
+  }, []);
+
+  const handleFiltersChange = (nextFilters: BlogListFilters) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    const title = nextFilters.title?.replace(/^%|%$/g, "");
+    const author = nextFilters.author?.replace(/^%|%$/g, "");
+    const tag = nextFilters.tags?.[0];
+
+    if (title) params.set("title", title);
+    else params.delete("title");
+
+    if (author) params.set("author", author);
+    else params.delete("author");
+
+    if (tag) params.set("tag", tag);
+    else params.delete("tag");
+
+    const query = params.toString();
+    router.push(query ? `${pathname}?${query}` : pathname);
+    setPaginationState((prev) => ({ ...prev, pageIndex: 0 }));
+  };
+
+  useEffect(() => {
+    setPaginationState((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [filters]);
+
+  return (
+    <div>
+      <PublicTagBrowse />
+      <BlogFilters filters={filters} onChange={handleFiltersChange} />
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {data?.data?.map((blog) => (
+          <BlogListCard key={blog.slug} blog={blog} />
+        ))}
+      </div>
+      <Separator className="my-8" />
+      <div className="flex w-full justify-center">
+        <StandardPagination
+          page={paginationState.pageIndex + 1}
+          totalPages={totalPages}
+          setPage={(page) => setPageIndex(page - 1)}
+        />
+      </div>
+    </div>
+  );
 }

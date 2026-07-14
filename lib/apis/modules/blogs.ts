@@ -1,5 +1,10 @@
 import type { Blog, GraphqlResponseWithPaginatorInfo } from "@/lib/types";
 import type { CreateBlogDto, UpdateBlogDto } from "@/lib/schemas";
+import type {
+  BlogListFilters,
+  BlogOrderByClause,
+} from "@/lib/utils/blog-filters";
+import { orderByToGraphql } from "@/lib/utils/blog-filters";
 
 import { createGraphqlClient } from "./graphql";
 import type { ApiFetcher } from "../core/types";
@@ -13,6 +18,8 @@ type BlogListQueryVariables = {
   tags?: string[];
   title?: string;
   author?: string;
+  is_published?: boolean;
+  orderBy?: BlogOrderByClause[];
 };
 
 /**
@@ -39,14 +46,17 @@ export function createBlogApi(fetcher: ApiFetcher) {
   const { post, put, del } = createHttpMethods(fetcher);
 
   const blogListQuery = `
-    query Blogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String) {
-        blogs(first: $first, page: $page, hasTags: $tags, title: $title, author: $author) {
+    query Blogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String, $isPublished: Boolean, $orderBy: [QueryBlogsOrderByOrderByClause!]) {
+        blogs(first: $first, page: $page, hasTags: $tags, title: $title, author: $author, is_published: $isPublished, orderBy: $orderBy) {
             data {
                 slug
                 title
                 description
                 author
                 is_published
+                tags {
+                    name
+                }
                 ${heroAssetFields}
                 created_at
                 updated_at
@@ -66,8 +76,8 @@ export function createBlogApi(fetcher: ApiFetcher) {
   `;
 
   const publicBlogListQuery = `
-    query PublicBlogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String) {
-      blogsPublic(first: $first, page: $page, hasTags: $tags, title: $title, author: $author) {
+    query PublicBlogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String, $orderBy: [QueryBlogsPublicOrderByOrderByClause!]) {
+      blogsPublic(first: $first, page: $page, hasTags: $tags, title: $title, author: $author, orderBy: $orderBy) {
         data {
           slug
           title
@@ -152,6 +162,34 @@ export function createBlogApi(fetcher: ApiFetcher) {
     }
   `;
 
+  const blogTagsQuery = `
+    query BlogTags {
+      blogTags {
+        id
+        name
+      }
+    }
+  `;
+
+  const publicBlogTagsQuery = `
+    query PublicBlogTags {
+      blogTagsPublic {
+        id
+        name
+      }
+    }
+  `;
+
+  const buildListVariables = (variables: BlogListQueryVariables) => ({
+    first: variables.first,
+    page: variables.page,
+    tags: variables.tags,
+    title: variables.title,
+    author: variables.author,
+    isPublished: variables.is_published,
+    orderBy: orderByToGraphql(variables.orderBy),
+  });
+
   return {
     createBlog: async (data: CreateBlogDto) => {
       const response = await post<{ data: { slug: string } }>(
@@ -176,7 +214,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
     ) => {
       const response = await gql.request<{
         blogs: GraphqlResponseWithPaginatorInfo<Blog>;
-      }>(blogListQuery, variables);
+      }>(blogListQuery, buildListVariables(variables));
       return response.blogs;
     },
     listPublicBlogs: async (
@@ -184,7 +222,14 @@ export function createBlogApi(fetcher: ApiFetcher) {
     ) => {
       const response = await gql.request<{
         blogsPublic: GraphqlResponseWithPaginatorInfo<Blog>;
-      }>(publicBlogListQuery, variables);
+      }>(publicBlogListQuery, {
+        first: variables.first,
+        page: variables.page,
+        tags: variables.tags,
+        title: variables.title,
+        author: variables.author,
+        orderBy: orderByToGraphql(variables.orderBy),
+      });
       return response.blogsPublic;
     },
     listPublicBlogSlugs: async (
@@ -222,6 +267,18 @@ export function createBlogApi(fetcher: ApiFetcher) {
       }
 
       return blog;
+    },
+    listBlogTags: async () => {
+      const response = await gql.request<{
+        blogTags: { id: string; name: string }[];
+      }>(blogTagsQuery);
+      return response.blogTags;
+    },
+    listPublicBlogTags: async () => {
+      const response = await gql.request<{
+        blogTagsPublic: { id: string; name: string }[];
+      }>(publicBlogTagsQuery);
+      return response.blogTagsPublic;
     },
   };
 }
