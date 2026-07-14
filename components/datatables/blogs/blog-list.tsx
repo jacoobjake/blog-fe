@@ -2,7 +2,6 @@
 
 import BlogFilters from "@/components/blogs/blog-filters";
 import DeleteBlogButton from "@/components/blogs/delete-blog-button";
-import RestoreBlogButton from "@/components/blogs/restore-blog-button";
 import OpenEditorButton from "@/components/editors/open-editor-btn";
 import { useBlogTags } from "@/hooks/blogs";
 import { blogApi } from "@/lib/apis";
@@ -34,7 +33,6 @@ export default function BlogList() {
   const queryClient = useQueryClient();
   const { data: tagOptions = [] } = useBlogTags();
   const [filters, setFilters] = useState<BlogListFilters>({});
-  const showDeletedOnly = filters.trashed === "ONLY";
   const [sorting, setSorting] = useState<SortingState>([
     { id: "updated_at", desc: true },
   ]);
@@ -109,46 +107,23 @@ export default function BlogList() {
           return dateToDatetimeString(dt);
         },
       },
-      ...(showDeletedOnly
-        ? [
-            {
-              accessorKey: "deleted_at",
-              header: "Deleted At",
-              cell: (info: { row: { original: Blog } }) => {
-                const deletedAt = info.row.original.deleted_at;
-                if (!deletedAt) return <span className="text-muted">—</span>;
-                return dateToDatetimeString(new Date(deletedAt));
-              },
-            } as ColumnDef<Blog>,
-          ]
-        : []),
       {
         id: "actions",
         cell: (info) => {
           const row = info.row;
           return (
             <div className="flex items-center justify-end gap-2">
-              {!showDeletedOnly && (
-                <>
-                  <OpenEditorButton variant="ghost" slug={row.original.slug} />
-                  <DeleteBlogButton
-                    slug={row.original.slug}
-                    title={row.original.title}
-                  />
-                </>
-              )}
-              {showDeletedOnly && (
-                <RestoreBlogButton
-                  slug={row.original.slug}
-                  title={row.original.title}
-                />
-              )}
+              <OpenEditorButton variant="ghost" slug={row.original.slug} />
+              <DeleteBlogButton
+                slug={row.original.slug}
+                title={row.original.title}
+              />
             </div>
           );
         },
       },
     ],
-    [showDeletedOnly],
+    [],
   );
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
@@ -175,7 +150,6 @@ export default function BlogList() {
         author: filters.author,
         tags: filters.tags,
         is_published: filters.is_published,
-        trashed: filters.trashed,
         orderBy: sortingStateToOrderBy(sorting),
       });
       return data;
@@ -219,7 +193,6 @@ export default function BlogList() {
         filters={filters}
         onChange={setFilters}
         showPublishedFilter
-        showTrashedFilter
         tagSuggestions={tagOptions.map((tag) => tag.name)}
       />
       <HeroTableLayout

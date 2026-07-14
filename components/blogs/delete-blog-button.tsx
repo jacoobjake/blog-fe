@@ -67,8 +67,8 @@ export default function DeleteBlogButton({
             </Modal.Header>
             <Modal.Body className="space-y-3">
               <p>
-                Are you sure you want to delete <strong>{title}</strong>? The
-                post will be moved to deleted items and can be restored later.
+                Are you sure you want to delete <strong>{title}</strong>? It
+                will be removed from the site immediately.
               </p>
               {error && <p className="text-sm text-danger">{error}</p>}
             </Modal.Body>

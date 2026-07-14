@@ -3,7 +3,6 @@ export type BlogListFilters = {
   author?: string;
   tags?: string[];
   is_published?: boolean;
-  trashed?: "ONLY" | "WITH" | "WITHOUT";
 };
 
 export type BlogOrderByColumn =

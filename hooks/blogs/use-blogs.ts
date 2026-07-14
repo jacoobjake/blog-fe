@@ -1,6 +1,6 @@
 "use client";
 
-import { deleteBlogAction, restoreBlogAction } from "@/lib/actions/blogs";
+import { deleteBlogAction } from "@/lib/actions/blogs";
 import { blogApi } from "@/lib/apis";
 import type {
   BlogListFilters,
@@ -38,19 +38,6 @@ export function useDeleteBlog() {
 
   return useMutation({
     mutationFn: (slug: string) => deleteBlogAction(slug),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: blogQueryKeys.all });
-      queryClient.invalidateQueries({ queryKey: blogQueryKeys.publicAll });
-      queryClient.invalidateQueries({ queryKey: blogQueryKeys.dashboard });
-    },
-  });
-}
-
-export function useRestoreBlog() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (slug: string) => restoreBlogAction(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogQueryKeys.all });
       queryClient.invalidateQueries({ queryKey: blogQueryKeys.publicAll });
