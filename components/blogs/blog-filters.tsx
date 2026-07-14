@@ -9,6 +9,7 @@ type BlogFiltersProps = {
   filters: BlogListFilters;
   onChange: (filters: BlogListFilters) => void;
   showPublishedFilter?: boolean;
+  showTrashedFilter?: boolean;
   tagSuggestions?: string[];
 };
 
@@ -16,6 +17,7 @@ export default function BlogFilters({
   filters,
   onChange,
   showPublishedFilter = false,
+  showTrashedFilter = false,
   tagSuggestions = [],
 }: BlogFiltersProps) {
   const [title, setTitle] = useState("");
@@ -44,11 +46,22 @@ export default function BlogFilters({
     onChange({});
   };
 
+  const showDeletedOnly = filters.trashed === "ONLY";
+
+  const toggleDeletedOnly = () => {
+    onChange({
+      ...filters,
+      trashed: showDeletedOnly ? undefined : "ONLY",
+      is_published: showDeletedOnly ? filters.is_published : undefined,
+    });
+  };
+
   const hasActiveFilters =
     Boolean(filters.title) ||
     Boolean(filters.author) ||
     Boolean(filters.tags?.length) ||
-    filters.is_published !== undefined;
+    filters.is_published !== undefined ||
+    filters.trashed === "ONLY";
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
@@ -99,7 +112,7 @@ export default function BlogFilters({
         </div>
       </div>
 
-      {showPublishedFilter && (
+      {showPublishedFilter && !showDeletedOnly && (
         <div className="max-w-xs space-y-1">
           <Label>Published status</Label>
           <Select
@@ -146,10 +159,19 @@ export default function BlogFilters({
         </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button size="sm" onPress={applyFilters}>
           Apply filters
         </Button>
+        {showTrashedFilter && (
+          <Button
+            size="sm"
+            variant={showDeletedOnly ? "primary" : "secondary"}
+            onPress={toggleDeletedOnly}
+          >
+            {showDeletedOnly ? "Showing deleted" : "Show deleted"}
+          </Button>
+        )}
         {hasActiveFilters && (
           <Button size="sm" variant="ghost" onPress={clearFilters}>
             Clear

@@ -19,6 +19,7 @@ type BlogListQueryVariables = {
   title?: string;
   author?: string;
   is_published?: boolean;
+  trashed?: "ONLY" | "WITH" | "WITHOUT";
   orderBy?: BlogOrderByClause[];
 };
 
@@ -46,8 +47,8 @@ export function createBlogApi(fetcher: ApiFetcher) {
   const { post, put, del } = createHttpMethods(fetcher);
 
   const blogListQuery = `
-    query Blogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String, $isPublished: Boolean, $orderBy: [QueryBlogsOrderByOrderByClause!]) {
-        blogs(first: $first, page: $page, hasTags: $tags, title: $title, author: $author, is_published: $isPublished, orderBy: $orderBy) {
+    query Blogs($first: Int!, $page: Int!, $tags: [String!], $title: String, $author: String, $isPublished: Boolean, $trashed: Trashed, $orderBy: [QueryBlogsOrderByOrderByClause!]) {
+        blogs(first: $first, page: $page, hasTags: $tags, title: $title, author: $author, is_published: $isPublished, trashed: $trashed, orderBy: $orderBy) {
             data {
                 slug
                 title
@@ -60,6 +61,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
                 ${heroAssetFields}
                 created_at
                 updated_at
+                deleted_at
             }
             paginatorInfo {
                 count
@@ -187,6 +189,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
     title: variables.title,
     author: variables.author,
     isPublished: variables.is_published,
+    trashed: variables.trashed,
     orderBy: orderByToGraphql(variables.orderBy),
   });
 
@@ -208,6 +211,12 @@ export function createBlogApi(fetcher: ApiFetcher) {
     deleteBlog: async (slug: string) => {
       const response = await del(`${ADMIN_BLOG_PATH}/${slug}`);
       return response;
+    },
+    restoreBlog: async (slug: string) => {
+      const response = await post<{ data: { slug: string } }>(
+        `${ADMIN_BLOG_PATH}/${slug}/restore`,
+      );
+      return response.data;
     },
     listBlogs: async (
       variables: BlogListQueryVariables = { first: 10, page: 1 },

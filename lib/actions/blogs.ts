@@ -31,3 +31,12 @@ export async function deleteBlogAction(slug: string) {
 
   await revalidatePublicBlogs({ slug });
 }
+
+export async function restoreBlogAction(slug: string) {
+  const blogApi = await getServerBlogApi();
+  const result = await blogApi.restoreBlog(slug);
+
+  await revalidatePublicBlogs({ slug: result.slug });
+
+  return result;
+}
