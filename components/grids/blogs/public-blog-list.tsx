@@ -95,7 +95,7 @@ export default function PublicBlogList() {
   return (
     <div>
       <PublicTagBrowse />
-      <BlogFilters filters={filters} onChange={handleFiltersChange} />
+      <BlogFilters filters={filters} onChange={handleFiltersChange} variant="naked" />
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data?.data?.map((blog) => (
           <BlogListCard key={blog.slug} blog={blog} />

@@ -1,6 +1,7 @@
 "use client";
 
-import { applyTheme } from "@/lib/utils/theme";
+import { applyTheme, isTheme, readStoredTheme } from "@/lib/utils/theme";
+import { THEME_STORAGE_KEY } from "@/constants";
 import { createThemeStore } from "@/stores";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
@@ -39,6 +40,46 @@ export function ThemeApplier({ store }: { store: ThemeStoreApi }) {
 
     applyTheme(theme);
   }, [theme, hasHydrated]);
+
+  // Keep theme + icon in sync when another tab changes localStorage.
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== THEME_STORAGE_KEY || event.newValue == null) {
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(event.newValue) as {
+          state?: { theme?: unknown };
+        };
+        const nextTheme = parsed.state?.theme;
+        if (!isTheme(nextTheme) || nextTheme === store.getState().theme) {
+          return;
+        }
+
+        store.setState({ theme: nextTheme });
+        applyTheme(nextTheme);
+      } catch {
+        // Ignore invalid storage payloads.
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [store]);
+
+  // Align with localStorage if cookie/dom lagged behind another tab's write.
+  useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
+    const stored = readStoredTheme();
+    if (stored && stored !== store.getState().theme) {
+      store.setState({ theme: stored });
+      applyTheme(stored);
+    }
+  }, [hasHydrated, store]);
 
   return null;
 }

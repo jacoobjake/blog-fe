@@ -5,6 +5,43 @@
  * @see https://v3.heroui.com/docs/react/getting-started/theming
  */
 
+/*
+ * HeroUI's default `dark:` variant falls back to prefers-color-scheme even when
+ * data-theme="light" is set. Re-declare so an explicit light theme wins.
+ */
+@custom-variant dark {
+  &:is(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+
+    &::before,
+    &::after {
+      @slot;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:not(
+      :is(
+        .dark,
+        .dark *,
+        .light,
+        .light *,
+        [data-theme="dark"],
+        [data-theme="dark"] *,
+        [data-theme="light"],
+        [data-theme="light"] *
+      )
+    ) {
+      @slot;
+
+      &::before,
+      &::after {
+        @slot;
+      }
+    }
+  }
+}
+
 :root,
 .light,
 .default,

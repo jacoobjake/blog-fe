@@ -2,12 +2,7 @@
 
 import { useDeleteBlog } from "@/hooks/blogs";
 import { formatError } from "@/lib/utils/api-error";
-import {
-  Button,
-  CloseButton,
-  Modal,
-  useOverlayState,
-} from "@heroui/react";
+import { Button, Modal, useOverlayState } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FiTrash2 } from "react-icons/fi";
@@ -51,19 +46,19 @@ export default function DeleteBlogButton({
       <Button
         size={size}
         variant={variant}
+        isIconOnly
         aria-label={`Delete ${title}`}
         onPress={modal.open}
       >
         <FiTrash2 />
-        Delete
       </Button>
 
       <Modal.Backdrop isOpen={modal.isOpen} onOpenChange={modal.setOpen}>
         <Modal.Container size="sm">
           <Modal.Dialog>
-            <Modal.Header className="flex items-center justify-between">
+            <Modal.CloseTrigger />
+            <Modal.Header>
               <Modal.Heading>Delete blog</Modal.Heading>
-              <CloseButton onPress={modal.close} />
             </Modal.Header>
             <Modal.Body className="space-y-3">
               <p>
@@ -72,7 +67,7 @@ export default function DeleteBlogButton({
               </p>
               {error && <p className="text-sm text-danger">{error}</p>}
             </Modal.Body>
-            <Modal.Footer className="flex justify-end gap-2">
+            <Modal.Footer>
               <Button variant="ghost" onPress={modal.close}>
                 Cancel
               </Button>

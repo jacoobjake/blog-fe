@@ -12,7 +12,7 @@ export default function PublicTagBrowse() {
   }
 
   return (
-    <div className="mb-8 space-y-3">
+    <div className="mb-6 space-y-3">
       <h2 className="text-lg font-semibold">Browse by tag</h2>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (

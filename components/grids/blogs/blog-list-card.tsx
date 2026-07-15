@@ -13,8 +13,13 @@ export default function BlogListCard({
   const createdAt = new Date(blog.created_at);
 
   return (
-    <Link href={`/blogs/${blog.slug}`}>
-      <div className="rounded-xl overflow-hidden shadow-accent/50 hover:shadow-lg transition bg-surface h-96 flex flex-col cursor-pointer">
+    <article className="relative rounded-xl overflow-hidden shadow-accent/50 hover:shadow-lg transition bg-surface h-96 flex flex-col">
+      <Link
+        href={`/blogs/${blog.slug}`}
+        className="absolute inset-0 z-0"
+        aria-label={blog.title}
+      />
+      <div className="relative z-10 flex h-full flex-col pointer-events-none">
         <div className="relative h-48 w-full bg-accent/50">
           <BlogCardThumbnail
             media={blog.hero_asset?.media}
@@ -31,16 +36,18 @@ export default function BlogListCard({
                 {blog.description}
               </p>
             )}
-            <BlogTagList tags={blog.tags ?? []} className="mt-3" />
+            <div className="pointer-events-auto relative z-10">
+              <BlogTagList tags={blog.tags ?? []} className="mt-3" />
+            </div>
           </div>
           <div>
             <p>{blog.author}</p>
-            <p className="text-black/30 text-xs">
+            <p className="text-black/30 text-xs dark:text-white/40">
               {dateToDateString(createdAt)}
             </p>
           </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

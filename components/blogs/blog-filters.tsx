@@ -2,7 +2,14 @@
 
 import type { BlogListFilters } from "@/lib/utils/blog-filters";
 import { parseTagsInput, toLikePattern } from "@/lib/utils/blog-filters";
-import { Button, Input, Label, Select, ListBox } from "@heroui/react";
+import {
+  Button,
+  Checkbox,
+  Input,
+  Label,
+  Separator,
+  TextField,
+} from "@heroui/react";
 import { useEffect, useState } from "react";
 
 type BlogFiltersProps = {
@@ -10,6 +17,8 @@ type BlogFiltersProps = {
   onChange: (filters: BlogListFilters) => void;
   showPublishedFilter?: boolean;
   tagSuggestions?: string[];
+  /** `panel` = card (admin). `naked` = separators (public). */
+  variant?: "panel" | "naked";
 };
 
 export default function BlogFilters({
@@ -17,6 +26,7 @@ export default function BlogFilters({
   onChange,
   showPublishedFilter = false,
   tagSuggestions = [],
+  variant = "panel",
 }: BlogFiltersProps) {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -50,41 +60,51 @@ export default function BlogFilters({
     Boolean(filters.tags?.length) ||
     filters.is_published !== undefined;
 
-  return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
+  const fields = (
+    <>
       <div className="grid gap-3 md:grid-cols-3">
-        <div className="space-y-1">
-          <Label htmlFor="blog-filter-title">Title</Label>
+        <TextField
+          name="title"
+          value={title}
+          onChange={setTitle}
+          className="w-full"
+        >
+          <Label>Title</Label>
           <Input
-            id="blog-filter-title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
             placeholder="Search by title"
             onKeyDown={(e) => {
               if (e.key === "Enter") applyFilters();
             }}
           />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="blog-filter-author">Author</Label>
+        </TextField>
+
+        <TextField
+          name="author"
+          value={author}
+          onChange={setAuthor}
+          className="w-full"
+        >
+          <Label>Author</Label>
           <Input
-            id="blog-filter-author"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
             placeholder="Search by author"
             onKeyDown={(e) => {
               if (e.key === "Enter") applyFilters();
             }}
           />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="blog-filter-tags">Tags</Label>
+        </TextField>
+
+        <TextField
+          name="tags"
+          value={tags}
+          onChange={setTags}
+          className="w-full"
+        >
+          <Label>Tags</Label>
           <Input
-            id="blog-filter-tags"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
             placeholder="Comma-separated tags"
-            list={tagSuggestions.length > 0 ? "blog-tag-suggestions" : undefined}
+            list={
+              tagSuggestions.length > 0 ? "blog-tag-suggestions" : undefined
+            }
             onKeyDown={(e) => {
               if (e.key === "Enter") applyFilters();
             }}
@@ -96,66 +116,57 @@ export default function BlogFilters({
               ))}
             </datalist>
           )}
-        </div>
+        </TextField>
       </div>
 
       {showPublishedFilter && (
-        <div className="max-w-xs space-y-1">
-          <Label>Published status</Label>
-          <Select
-            aria-label="Published status"
-            value={
-              filters.is_published === undefined
-                ? "all"
-                : filters.is_published
-                  ? "published"
-                  : "draft"
-            }
-            onChange={(value) => {
-              const next =
-                value === "all"
-                  ? undefined
-                  : value === "published";
-              onChange({
-                ...filters,
-                is_published: next,
-              });
-            }}
-          >
-            <Select.Trigger>
-              <Select.Value />
-              <Select.Indicator />
-            </Select.Trigger>
-            <Select.Popover>
-              <ListBox>
-                <ListBox.Item id="all" textValue="All">
-                  All
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-                <ListBox.Item id="published" textValue="Published">
-                  Published
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-                <ListBox.Item id="draft" textValue="Draft">
-                  Draft
-                  <ListBox.ItemIndicator />
-                </ListBox.Item>
-              </ListBox>
-            </Select.Popover>
-          </Select>
-        </div>
+        <Checkbox
+          isSelected={filters.is_published === true}
+          onChange={(isSelected) => {
+            onChange({
+              ...filters,
+              is_published: isSelected ? true : undefined,
+            });
+          }}
+        >
+          <Checkbox.Control>
+            <Checkbox.Indicator />
+          </Checkbox.Control>
+          <Checkbox.Content>
+            <Label>Published only</Label>
+          </Checkbox.Content>
+        </Checkbox>
       )}
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          isDisabled={!hasActiveFilters}
+          onPress={clearFilters}
+        >
+          Clear
+        </Button>
         <Button size="sm" onPress={applyFilters}>
           Apply filters
         </Button>
-        {hasActiveFilters && (
-          <Button size="sm" variant="ghost" onPress={clearFilters}>
-            Clear
-          </Button>
-        )}
       </div>
+    </>
+  );
+
+  if (variant === "naked") {
+    return (
+      <div className="flex flex-col gap-4">
+        <Separator />
+        {fields}
+        <Separator />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4">
+      {fields}
     </div>
   );
 }
