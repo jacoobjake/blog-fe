@@ -33,7 +33,7 @@ export default function AdminHeader() {
       <MobileMenu />
       <div className="grow flex justify-end gap-2 items-center">
         <AdminAccountMenu />
-        <ThemeSwitch className="hidden md:block" />
+        <ThemeSwitch className="hidden md:inline-flex" />
       </div>
     </div>
   );

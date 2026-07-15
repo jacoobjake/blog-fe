@@ -16,8 +16,21 @@ export default async function AdminBlogsPage() {
 
   // Prefetch page 1
   await queryClient.prefetchQuery({
-    queryKey: ["blogs", { pageIndex: 0, pageSize: PAGE_SIZE }],
-    queryFn: () => api.blogs.listBlogs({ first: PAGE_SIZE, page: 1 }),
+    queryKey: [
+      "blogs",
+      {
+        pagination: { pageIndex: 0, pageSize: PAGE_SIZE },
+        filters: {},
+        sorting: [{ id: "updated_at", desc: true }],
+        orderBy: [{ column: "updated_at", order: "DESC" }],
+      },
+    ],
+    queryFn: () =>
+      api.blogs.listBlogs({
+        first: PAGE_SIZE,
+        page: 1,
+        orderBy: [{ column: "updated_at", order: "DESC" }],
+      }),
   });
 
   return (

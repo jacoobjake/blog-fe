@@ -24,3 +24,10 @@ export async function updateBlogAction(
 
   return result;
 }
+
+export async function deleteBlogAction(slug: string) {
+  const blogApi = await getServerBlogApi();
+  await blogApi.deleteBlog(slug);
+
+  await revalidatePublicBlogs({ slug });
+}

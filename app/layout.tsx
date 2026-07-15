@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Figtree, Playfair_Display } from "next/font/google";
+import { cookies } from "next/headers";
 
 const figtree = Figtree({
   subsets: ["latin"],
@@ -14,7 +15,9 @@ const playfair = Playfair_Display({
 });
 
 import "@/styles/globals.css";
-import { THEME_STORAGE_KEY } from "@/constants";
+import { COOKIE_NAME, THEME_STORAGE_KEY } from "@/constants";
+import { isTheme } from "@/lib/utils/theme";
+import type { Theme } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_APP_NAME,
@@ -26,11 +29,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const cookieTheme = cookieStore.get(COOKIE_NAME.THEME)?.value;
+  const theme: Theme = isTheme(cookieTheme) ? cookieTheme : "light";
+
   return (
     <html
       suppressHydrationWarning
       lang="en"
-      className={`${figtree.variable} ${playfair.variable} relative`}
+      data-theme={theme}
+      className={`${figtree.variable} ${playfair.variable} relative ${theme}`}
+      style={{ colorScheme: theme }}
     >
       <head>
         <script
@@ -44,19 +53,23 @@ export default async function RootLayout({
                           var parsed = JSON.parse(stored);
                           theme = parsed.state && parsed.state.theme;
                       }
-                      if (!theme) {
+                      if (theme !== 'light' && theme !== 'dark') {
                           theme = window.matchMedia('(prefers-color-scheme: dark)').matches
                               ? 'dark'
                               : 'light';
                       }
-                      document.documentElement.setAttribute('data-theme', theme);
-                      document.documentElement.classList.toggle('dark', theme === 'dark');
+                      var root = document.documentElement;
+                      root.setAttribute('data-theme', theme);
+                      root.classList.toggle('dark', theme === 'dark');
+                      root.classList.toggle('light', theme === 'light');
+                      root.style.colorScheme = theme;
+                      document.cookie = ${JSON.stringify(COOKIE_NAME.THEME)} + '=' + theme + '; path=/; max-age=31536000; SameSite=Lax';
                   } catch (_) {}
               })();`,
           }}
         />
       </head>
-      <body className="bg-background relative">{children}</body>
+      <body className="bg-background text-foreground relative">{children}</body>
     </html>
   );
 }

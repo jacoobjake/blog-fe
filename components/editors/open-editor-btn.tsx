@@ -13,18 +13,26 @@ export default function OpenEditorButton({
   variant = "secondary",
   editorType = "blog",
   slug,
+  ...props
 }: OpenEditorButtonProps) {
   const router = useRouter();
 
   const handleClick = () => {
     if (editorType === "blog") {
-      // Navigate to the blog editor in the current tab
-      router.push(`/admin/editor/blogs?slug=${slug}`);
+      router.push(
+        slug ? `/admin/editor/blogs?slug=${slug}` : "/admin/editor/blogs",
+      );
     }
   };
 
   return (
-    <Button isIconOnly aria-label="Open editor" variant={variant} onClick={handleClick}>
+    <Button
+      isIconOnly
+      aria-label="Open editor"
+      variant={variant}
+      onClick={handleClick}
+      {...props}
+    >
       <FiLayout />
     </Button>
   );

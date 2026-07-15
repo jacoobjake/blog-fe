@@ -13,18 +13,21 @@ import {
 } from "@heroui/react";
 import { UseQueryResult } from "@tanstack/react-query";
 import { FaChevronUp } from "react-icons/fa6";
-import { toSortDescriptor } from "./utils";
+import { toSortDescriptor, toSortingState } from "./utils";
 import { Fragment, useMemo } from "react";
 import { PiTray } from "react-icons/pi";
+import type { SortDescriptor } from "@heroui/react";
 
 type BasicTableLayoutProps<T> = {
   table: Table<T>;
   query: Pick<UseQueryResult, "isLoading" | "isError" | "isFetching" | "error">;
+  onSortChange?: (descriptor: SortDescriptor) => void;
 };
 
 export default function HeroTableLayout<T>({
   table,
   query,
+  onSortChange,
 }: BasicTableLayoutProps<T>) {
   const rows = table.getRowModel().rows;
   const headerGroups = table.getHeaderGroups();
@@ -44,6 +47,7 @@ export default function HeroTableLayout<T>({
           <HeroTable.Content
             aria-label="Data table"
             sortDescriptor={sortDescriptor}
+            onSortChange={(descriptor) => onSortChange?.(descriptor)}
           >
             <HeroTable.Header>
               {headerGroups.map((headerGroup) => (

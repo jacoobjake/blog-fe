@@ -1,7 +1,16 @@
 "use client";
 
+import BlogFilters from "@/components/blogs/blog-filters";
+import DeleteBlogButton from "@/components/blogs/delete-blog-button";
+import OpenEditorButton from "@/components/editors/open-editor-btn";
+import { useBlogTags } from "@/hooks/blogs";
 import { blogApi } from "@/lib/apis";
 import { Blog } from "@/lib/types";
+import {
+  sortingStateToOrderBy,
+  type BlogListFilters,
+} from "@/lib/utils/blog-filters";
+import { dateToDatetimeString } from "@/lib/utils";
 import {
   keepPreviousData,
   useQuery,
@@ -11,30 +20,66 @@ import {
   ColumnDef,
   getCoreRowModel,
   PaginationState,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import { Chip } from "@heroui/react";
-import OpenEditorButton from "@/components/editors/open-editor-btn";
+import Link from "next/link";
 import HeroTableLayout from "../layouts/hero-table";
-import { dateToDatetimeString } from "@/lib/utils";
+import { toSortingState } from "../layouts/utils";
 
 export default function BlogList() {
   const queryClient = useQueryClient();
+  const { data: tagOptions = [] } = useBlogTags();
+  const [filters, setFilters] = useState<BlogListFilters>({});
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "updated_at", desc: true },
+  ]);
+
   const columns = useMemo<ColumnDef<Blog>[]>(
     () => [
       {
         accessorKey: "title",
         header: "Title",
+        enableSorting: true,
+        cell: (info) => (
+          <Link
+            href={`/admin/blogs/${info.row.original.slug}`}
+            className="font-medium hover:text-accent"
+          >
+            {info.getValue<string>()}
+          </Link>
+        ),
       },
       {
         accessorKey: "author",
         header: "Author",
+        enableSorting: true,
+      },
+      {
+        accessorKey: "tags",
+        header: "Tags",
+        cell: (info) => {
+          const tags = info.row.original.tags ?? [];
+          if (tags.length === 0) return <span className="text-muted">—</span>;
+
+          return (
+            <div className="flex flex-wrap gap-1">
+              {tags.map((tag) => (
+                <Chip key={tag.name} size="sm" variant="soft">
+                  {tag.name}
+                </Chip>
+              ))}
+            </div>
+          );
+        },
       },
       {
         accessorKey: "is_published",
+        enableSorting: false,
         cell: (info) => {
-          const is_published = info.getValue();
+          const is_published = info.getValue<boolean>();
 
           return (
             <Chip variant="soft" color={is_published ? "success" : "default"}>
@@ -47,26 +92,32 @@ export default function BlogList() {
       {
         accessorKey: "created_at",
         header: "Created At",
+        enableSorting: true,
         cell: (info) => {
           const dt = new Date(info.row.original.created_at);
           return dateToDatetimeString(dt);
-        }
+        },
       },
       {
         accessorKey: "updated_at",
         header: "Updated At",
+        enableSorting: true,
         cell: (info) => {
           const dt = new Date(info.row.original.updated_at);
           return dateToDatetimeString(dt);
-        }
+        },
       },
       {
         id: "actions",
         cell: (info) => {
           const row = info.row;
           return (
-            <div className="flex items-center justify-end">
+            <div className="flex items-center justify-end gap-2">
               <OpenEditorButton variant="ghost" slug={row.original.slug} />
+              <DeleteBlogButton
+                slug={row.original.slug}
+                title={row.original.title}
+              />
             </div>
           );
         },
@@ -78,12 +129,28 @@ export default function BlogList() {
     pageIndex: 0,
     pageSize: 10,
   });
+
+  const queryVariables = useMemo(
+    () => ({
+      pagination: paginationState,
+      filters,
+      sorting,
+      orderBy: sortingStateToOrderBy(sorting),
+    }),
+    [filters, paginationState, sorting],
+  );
+
   const query = useQuery({
-    queryKey: ["blogs", paginationState],
+    queryKey: ["blogs", queryVariables],
     queryFn: async () => {
       const data = await blogApi.listBlogs({
         first: paginationState.pageSize,
         page: paginationState.pageIndex + 1,
+        title: filters.title,
+        author: filters.author,
+        tags: filters.tags,
+        is_published: filters.is_published,
+        orderBy: sortingStateToOrderBy(sorting),
       });
       return data;
     },
@@ -100,32 +167,39 @@ export default function BlogList() {
     rowCount: data?.paginatorInfo?.total ?? 0,
     state: {
       pagination: paginationState,
+      sorting,
     },
     onPaginationChange: setPaginationState,
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    debugTable: true,
+    manualSorting: true,
+    enableSortingRemoval: false,
   });
 
-  // Prefetch next page
+  useEffect(() => {
+    setPaginationState((prev) => ({ ...prev, pageIndex: 0 }));
+  }, [filters, sorting]);
+
   useEffect(() => {
     if (!isPlaceholderData && data?.paginatorInfo?.hasMorePages) {
-      queryClient.setQueryData(
-        [
-          "blogs",
-          {
-            pageIndex: paginationState.pageIndex + 1,
-            pageSize: paginationState.pageSize,
-          },
-        ],
-        data,
-      );
+      queryClient.setQueryData(["blogs", queryVariables], data);
     }
-  }, [isPlaceholderData, paginationState, data, queryClient]);
+  }, [data, isPlaceholderData, queryClient, queryVariables]);
 
   return (
     <div className="w-full min-h-full flex flex-col gap-4">
-      <HeroTableLayout table={table} query={query} />
+      <BlogFilters
+        filters={filters}
+        onChange={setFilters}
+        showPublishedFilter
+        tagSuggestions={tagOptions.map((tag) => tag.name)}
+      />
+      <HeroTableLayout
+        table={table}
+        query={query}
+        onSortChange={(descriptor) => table.setSorting(toSortingState(descriptor))}
+      />
     </div>
   );
 }
