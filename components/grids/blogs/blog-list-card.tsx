@@ -40,7 +40,7 @@ export default function BlogListCard({
               <BlogTagList tags={blog.tags ?? []} className="mt-3" />
             </div>
           </div>
-          <div>
+          <div className="mt-4">
             <p>{blog.author}</p>
             <p className="text-black/30 text-xs dark:text-white/40">
               {dateToDateString(createdAt)}

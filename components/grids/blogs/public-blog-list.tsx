@@ -11,6 +11,7 @@ import {
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import BlogListCard from "./blog-list-card";
+import { PublicBlogCardSkeleton } from "./public-blog-list-skeleton";
 import { PaginationState } from "@tanstack/react-table";
 import { Separator } from "@heroui/react";
 import StandardPagination from "@/components/ui/nav/standard-pagination";
@@ -45,7 +46,7 @@ export default function PublicBlogList() {
     [filters, paginationState],
   );
 
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["public-blogs", queryVariables],
     queryFn: async () => {
       const data = await blogApi.listPublicBlogs({
@@ -62,6 +63,7 @@ export default function PublicBlogList() {
   });
 
   const totalPages = data?.paginatorInfo.lastPage ?? 1;
+  const showCardSkeleton = isPending && !data;
 
   const setPageIndex = useCallback((pageIndex: number) => {
     setPaginationState((prev) => ({ ...prev, pageIndex }));
@@ -95,11 +97,19 @@ export default function PublicBlogList() {
   return (
     <div>
       <PublicTagBrowse />
-      <BlogFilters filters={filters} onChange={handleFiltersChange} variant="naked" />
+      <BlogFilters
+        filters={filters}
+        onChange={handleFiltersChange}
+        variant="naked"
+      />
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {data?.data?.map((blog) => (
-          <BlogListCard key={blog.slug} blog={blog} />
-        ))}
+        {showCardSkeleton
+          ? Array.from({ length: paginationState.pageSize }).map((_, index) => (
+              <PublicBlogCardSkeleton key={index} />
+            ))
+          : data?.data?.map((blog) => (
+              <BlogListCard key={blog.slug} blog={blog} />
+            ))}
       </div>
       <Separator className="my-8" />
       <div className="flex w-full justify-center">

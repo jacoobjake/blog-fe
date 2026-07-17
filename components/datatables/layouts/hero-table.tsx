@@ -10,10 +10,11 @@ import {
   Label,
   Input,
   EmptyState,
+  Skeleton,
 } from "@heroui/react";
 import { UseQueryResult } from "@tanstack/react-query";
 import { FaChevronUp } from "react-icons/fa6";
-import { toSortDescriptor, toSortingState } from "./utils";
+import { toSortDescriptor } from "./utils";
 import { Fragment, useMemo } from "react";
 import { PiTray } from "react-icons/pi";
 import type { SortDescriptor } from "@heroui/react";
@@ -32,11 +33,13 @@ export default function HeroTableLayout<T>({
   const rows = table.getRowModel().rows;
   const headerGroups = table.getHeaderGroups();
   const { pageSize, pageIndex } = table.getState().pagination;
+  const columnCount = table.getVisibleLeafColumns().length;
 
   const pageCount = table.getPageCount();
   const start = pageIndex * pageSize + 1;
   const end = start + rows.length - 1;
   const sorting = table.getState().sorting;
+  const showLoadingRows = query.isLoading && rows.length === 0;
 
   const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
 
@@ -72,38 +75,59 @@ export default function HeroTableLayout<T>({
               ))}
             </HeroTable.Header>
             <HeroTable.Body
-              renderEmptyState={() => (
-                <EmptyState className="flex h-full w-full flex-col items-center justify-center gap-4 text-center">
-                  <PiTray />
-                  <span className="text-sm text-muted">No results found</span>
-                </EmptyState>
-              )}
+              renderEmptyState={() =>
+                showLoadingRows ? null : (
+                  <EmptyState className="flex h-full w-full flex-col items-center justify-center gap-4 text-center">
+                    <PiTray />
+                    <span className="text-sm text-muted">No results found</span>
+                  </EmptyState>
+                )
+              }
             >
-              {table.getRowModel().rows.map((row) => (
-                <HeroTable.Row key={row.id} id={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <HeroTable.Cell key={cell.id} className="min-h-16">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
+              {showLoadingRows
+                ? Array.from({ length: pageSize }).map((_, rowIndex) => (
+                    <HeroTable.Row
+                      key={`loading-${rowIndex}`}
+                      id={`loading-${rowIndex}`}
+                    >
+                      {Array.from({ length: columnCount }).map(
+                        (_, colIndex) => (
+                          <HeroTable.Cell
+                            key={`loading-${rowIndex}-${colIndex}`}
+                            className="min-h-16"
+                          >
+                            <Skeleton className="h-5 w-full rounded-md" />
+                          </HeroTable.Cell>
+                        ),
                       )}
-                    </HeroTable.Cell>
+                    </HeroTable.Row>
+                  ))
+                : table.getRowModel().rows.map((row) => (
+                    <HeroTable.Row key={row.id} id={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <HeroTable.Cell key={cell.id} className="min-h-16">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </HeroTable.Cell>
+                      ))}
+                    </HeroTable.Row>
                   ))}
-                </HeroTable.Row>
-              ))}
             </HeroTable.Body>
           </HeroTable.Content>
           <HeroTable.Footer>
             <Pagination size="sm">
               <Pagination.Summary>
-                {start} to {end} of {table.getRowCount().toLocaleString()}{" "}
-                results
+                {showLoadingRows
+                  ? "Loading results…"
+                  : `${start} to ${end} of ${table.getRowCount().toLocaleString()} results`}
               </Pagination.Summary>
               <Pagination.Content className="space-x-2">
                 <Pagination.Item>
                   <Pagination.Previous
                     aria-label="Previous page"
-                    isDisabled={!table.getCanPreviousPage()}
+                    isDisabled={showLoadingRows || !table.getCanPreviousPage()}
                     onPress={() => table.previousPage()}
                   >
                     <Pagination.PreviousIcon />
@@ -113,7 +137,7 @@ export default function HeroTableLayout<T>({
                 <Pagination.Item>
                   <Pagination.Next
                     aria-label="Next page"
-                    isDisabled={!table.getCanNextPage()}
+                    isDisabled={showLoadingRows || !table.getCanNextPage()}
                     onPress={() => table.nextPage()}
                   >
                     Next
@@ -124,7 +148,8 @@ export default function HeroTableLayout<T>({
                   <Label>
                     Page &nbsp;
                     <strong>
-                      {pageIndex + 1} of {pageCount.toLocaleString()}
+                      {pageIndex + 1} of{" "}
+                      {showLoadingRows ? "…" : pageCount.toLocaleString()}
                     </strong>
                   </Label>
                 </Pagination.Item>
@@ -137,6 +162,7 @@ export default function HeroTableLayout<T>({
                       min="1"
                       max={table.getPageCount()}
                       defaultValue={table.getState().pagination.pageIndex + 1}
+                      disabled={showLoadingRows}
                       onChange={(e) => {
                         const page = e.target.value
                           ? Number(e.target.value) - 1
@@ -152,6 +178,7 @@ export default function HeroTableLayout<T>({
                     className="w-28"
                     aria-label="Select number of items per page"
                     value={table.getState().pagination.pageSize}
+                    isDisabled={showLoadingRows}
                     onChange={(v) => {
                       table.setPageSize(Number(v));
                     }}
@@ -163,7 +190,11 @@ export default function HeroTableLayout<T>({
                     <Select.Popover>
                       <ListBox>
                         {[10, 20, 30, 40, 50].map((pageSize) => (
-                          <ListBox.Item key={pageSize} id={pageSize} textValue={pageSize.toString()}>
+                          <ListBox.Item
+                            key={pageSize}
+                            id={pageSize}
+                            textValue={pageSize.toString()}
+                          >
                             Show {pageSize}
                             <ListBox.ItemIndicator />
                           </ListBox.Item>
