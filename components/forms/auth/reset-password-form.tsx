@@ -1,26 +1,28 @@
 "use client";
 
-import { LoginDto, LoginSchema } from "@/lib/schemas";
+import { ResetPasswordDto, ResetPasswordSchema } from "@/lib/schemas";
+import { authApi } from "@/lib/apis";
+import { formatError } from "@/lib/utils/api-error";
 import {
   Button,
-  cn,
   ErrorMessage,
   FieldError,
   Form,
   Input,
   Label,
   TextField,
-  type FormProps,
 } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatError } from "@/lib/utils/api-error";
-import { useAuth } from "@/hooks/auth";
+import { Controller, useForm } from "react-hook-form";
 
-export default function LoginForm({ className, ...props }: FormProps) {
-  const { login } = useAuth();
+type ResetPasswordFormProps = {
+  email: string;
+  token: string;
+};
+
+export default function ResetPasswordForm({ email, token }: ResetPasswordFormProps) {
   const router = useRouter();
   const {
     control,
@@ -29,18 +31,20 @@ export default function LoginForm({ className, ...props }: FormProps) {
     setError,
   } = useForm({
     defaultValues: {
-      email: "",
+      email,
+      token,
       password: "",
+      password_confirmation: "",
     },
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(ResetPasswordSchema),
   });
 
   const { errors, isSubmitting } = formState;
 
-  const handleSubmit = async (data: LoginDto) => {
+  const handleSubmit = async (data: ResetPasswordDto) => {
     try {
-      await login(data);
-      router.push("/admin");
+      await authApi.resetPassword(data);
+      router.push("/admin/login");
     } catch (e) {
       const formatted = formatError(e);
       setError("root.serverError", {
@@ -52,29 +56,13 @@ export default function LoginForm({ className, ...props }: FormProps) {
 
   return (
     <Form
-      className={cn(
-        "w-2/3 md:w-2/5 max-w-md p-12 rounded-4xl bg-background-secondary space-y-6",
-        className,
-      )}
-      {...props}
+      className="w-2/3 md:w-2/5 max-w-md p-12 rounded-4xl bg-background-secondary space-y-6"
       onSubmit={handleFormSubmit(handleSubmit)}
     >
-      <p className="text-center font-bold">Welcome Back</p>
-      <Controller
-        name="email"
-        control={control}
-        render={({ field, fieldState }) => (
-          <TextField
-            isInvalid={fieldState.invalid}
-            aria-label="Email"
-            type="email"
-          >
-            <Label>Email</Label>
-            <Input {...field} />
-            <FieldError>{fieldState.error?.message}</FieldError>
-          </TextField>
-        )}
-      />
+      <p className="text-center font-bold">Reset password</p>
+      <p className="text-sm text-muted text-center">
+        Choose a new password for <strong>{email}</strong>.
+      </p>
 
       <Controller
         name="password"
@@ -82,28 +70,45 @@ export default function LoginForm({ className, ...props }: FormProps) {
         render={({ field, fieldState }) => (
           <TextField
             isInvalid={fieldState.invalid}
-            aria-label="Password"
+            aria-label="New password"
             type="password"
           >
-            <Label>Password</Label>
+            <Label>New password</Label>
             <Input {...field} />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}
       />
+
+      <Controller
+        name="password_confirmation"
+        control={control}
+        render={({ field, fieldState }) => (
+          <TextField
+            isInvalid={fieldState.invalid}
+            aria-label="Confirm new password"
+            type="password"
+          >
+            <Label>Confirm new password</Label>
+            <Input {...field} />
+            <FieldError>{fieldState.error?.message}</FieldError>
+          </TextField>
+        )}
+      />
+
       {errors.root?.serverError && (
         <p className="text-center">
           <ErrorMessage>{errors.root.serverError.message}</ErrorMessage>
         </p>
       )}
 
-      <Button type="submit" className={"w-full"} isPending={isSubmitting}>
-        Login
+      <Button type="submit" className="w-full" isPending={isSubmitting}>
+        Reset password
       </Button>
 
       <p className="text-center text-sm">
-        <Link href="/admin/forgot-password" className="text-accent hover:underline">
-          Forgot password?
+        <Link href="/admin/login" className="text-accent hover:underline">
+          Back to login
         </Link>
       </p>
     </Form>

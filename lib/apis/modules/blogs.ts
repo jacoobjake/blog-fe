@@ -57,6 +57,14 @@ export function createBlogApi(fetcher: ApiFetcher) {
                 tags {
                     name
                 }
+                created_by {
+                    id
+                    name
+                }
+                updated_by {
+                    id
+                    name
+                }
                 ${heroAssetFields}
                 created_at
                 updated_at
@@ -135,6 +143,14 @@ export function createBlogApi(fetcher: ApiFetcher) {
         is_published
         ${heroAssetFields}
         tags {
+          name
+        }
+        created_by {
+          id
+          name
+        }
+        updated_by {
+          id
           name
         }
         created_at

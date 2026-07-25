@@ -19,12 +19,14 @@ type BlogDetailsFormProps = {
   blog: Blog;
   formId?: string;
   onSubmit: (data: UpdateBlogMetadataDto) => Promise<void>;
+  readOnly?: boolean;
 };
 
 export default function BlogDetailsForm({
   blog,
   formId = "blog-details-form",
   onSubmit,
+  readOnly = false,
 }: BlogDetailsFormProps) {
   const {
     control,
@@ -71,7 +73,7 @@ export default function BlogDetailsForm({
             type="text"
           >
             <Label>Title</Label>
-            <Input {...field} />
+            <Input {...field} disabled={readOnly} />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}
@@ -86,7 +88,7 @@ export default function BlogDetailsForm({
             type="text"
           >
             <Label>Author</Label>
-            <Input {...field} />
+            <Input {...field} disabled={readOnly} />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}
@@ -101,7 +103,7 @@ export default function BlogDetailsForm({
             type="text"
           >
             <Label>Description</Label>
-            <Input {...field} value={field.value ?? ""} />
+            <Input {...field} value={field.value ?? ""} disabled={readOnly} />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}

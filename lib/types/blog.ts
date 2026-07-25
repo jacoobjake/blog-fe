@@ -1,4 +1,5 @@
 import type { Asset } from "./asset";
+import type { UserSummary } from "./user";
 
 export enum BlogContentType {
   CompressedBase64 = "compressed_base64",
@@ -17,6 +18,8 @@ export type Blog = {
   author: string;
   is_published: boolean;
   tags: { name: string }[];
+  created_by?: UserSummary;
+  updated_by?: UserSummary;
   created_at: string;
   updated_at: string;
 };
