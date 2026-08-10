@@ -41,7 +41,7 @@ export default function BlogListCard({
             </div>
           </div>
           <div className="mt-4">
-            <p>{blog.author}</p>
+            <p>{blog.author_profile.name}</p>
             <p className="text-black/30 text-xs dark:text-white/40">
               {dateToDateString(createdAt)}
             </p>

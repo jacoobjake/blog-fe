@@ -1,4 +1,5 @@
 import type { Asset } from "./asset";
+import type { AuthorProfile } from "./author-profile";
 import type { UserSummary } from "./user";
 
 export enum BlogContentType {
@@ -15,7 +16,7 @@ export type Blog = {
   } | null;
   hero_asset_uuid?: string | null;
   hero_asset?: Asset | null;
-  author: string;
+  author_profile: AuthorProfile;
   is_published: boolean;
   tags: { name: string }[];
   created_by?: UserSummary;

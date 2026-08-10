@@ -1,7 +1,8 @@
 export type BlogHeaderElementProps = {
   title: string;
   description?: string;
-  author: string;
+  author_name: string;
+  author_bio?: string;
   is_published: boolean;
   tags: string[];
   created_at: Date | string;

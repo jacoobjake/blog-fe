@@ -69,7 +69,8 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
 
       const title = blogHeaderNode?.data.props.title || "";
       const description = blogHeaderNode?.data.props.description || "";
-      const author = blogHeaderNode?.data.props.author || "";
+      const author_name = blogHeaderNode?.data.props.author_name || "";
+      const author_bio = blogHeaderNode?.data.props.author_bio || "";
       const tags = blogHeaderNode?.data.props.tags || [];
       const is_published = blogHeaderNode?.data.props.is_published || false;
       const hero_asset_uuid =
@@ -81,7 +82,10 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
       const payload = {
         title: title.trim(),
         description: description.trim() || null,
-        author: author.trim(),
+        author_profile: {
+          name: author_name.trim(),
+          bio: author_bio.trim() || null,
+        },
         json_content: {
           type: BlogContentType.CompressedBase64,
           body: compressed,
@@ -206,6 +210,11 @@ function EditorContent({
         props.hero_asset_uuid = blog.hero_asset.uuid;
         props.hero_src = blog.hero_asset.media.url;
         props.hero_object_position = props.hero_object_position ?? "50% 50%";
+      }
+
+      if (blog.author_profile?.name) {
+        props.author_name = blog.author_profile.name;
+        props.author_bio = blog.author_profile.bio ?? "";
       }
     });
   }, [actions, blog, query]);

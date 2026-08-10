@@ -56,9 +56,10 @@ export default function BlogList() {
         ),
       },
       {
-        accessorKey: "author",
+        id: "author_profile.name",
+        accessorFn: (row) => row.author_profile.name,
         header: "Author",
-        enableSorting: true,
+        enableSorting: false,
       },
       {
         accessorKey: "tags",

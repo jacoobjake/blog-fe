@@ -1,7 +1,7 @@
 import type { Blog } from "@/lib/types/blog";
 import type { User } from "@/lib/types/user";
 
-const ELEVATED_ROLES = new Set(["admin", "editor"]);
+const ELEVATED_ROLES = new Set(["superadmin", "admin", "editor"]);
 
 export function canManageBlog(user: User | null | undefined, blog: Blog): boolean {
   if (!user) {

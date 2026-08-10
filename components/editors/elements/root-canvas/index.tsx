@@ -29,7 +29,8 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ user, children }) =
         is={BlogHeaderElement}
         canvas={false}
         title="Untitled Blog Post"
-        author={user?.name || "Anonymous"}
+        author_name={user?.name || "Anonymous"}
+        author_bio=""
         is_published={false}
         tags={[]}
         created_at=""

@@ -36,7 +36,10 @@ export default function BlogDetailsForm({
   } = useForm({
     defaultValues: {
       title: blog.title,
-      author: blog.author,
+      author_profile: {
+        name: blog.author_profile.name,
+        bio: blog.author_profile.bio ?? "",
+      },
       description: blog.description ?? "",
       tags: blog.tags.map((t) => t.name || ""),
     },
@@ -79,16 +82,37 @@ export default function BlogDetailsForm({
         )}
       />
       <Controller
-        name="author"
+        name="author_profile.name"
         control={control}
         render={({ field, fieldState }) => (
           <TextField
             isInvalid={fieldState.invalid}
-            aria-label="Author"
+            aria-label="Author name"
             type="text"
           >
-            <Label>Author</Label>
+            <Label>Author name</Label>
             <Input {...field} disabled={readOnly} />
+            <FieldError>{fieldState.error?.message}</FieldError>
+          </TextField>
+        )}
+      />
+      <Controller
+        name="author_profile.bio"
+        control={control}
+        render={({ field, fieldState }) => (
+          <TextField
+            isInvalid={fieldState.invalid}
+            aria-label="Author bio"
+            type="text"
+          >
+            <Label>Author bio</Label>
+            <textarea
+              {...field}
+              value={field.value ?? ""}
+              disabled={readOnly}
+              className="w-full px-3 py-2 border border-border rounded-md bg-field-background text-field-foreground"
+              rows={3}
+            />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}

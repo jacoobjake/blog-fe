@@ -1,4 +1,4 @@
-export type * from "./theme";
+export type * from "./author-profile";
 export type * from "./user";
 export type * from "./blog";
 export type * from "./asset";

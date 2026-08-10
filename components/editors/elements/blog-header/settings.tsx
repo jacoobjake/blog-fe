@@ -18,7 +18,8 @@ export const BlogHeaderSettings = () => {
   const {
     title,
     description,
-    author,
+    author_name,
+    author_bio,
     is_published,
     tags,
     hero_src,
@@ -27,7 +28,8 @@ export const BlogHeaderSettings = () => {
   } = useNode((node) => ({
     title: node.data.props.title as string,
     description: node.data.props.description as string | undefined,
-    author: node.data.props.author as string,
+    author_name: node.data.props.author_name as string,
+    author_bio: node.data.props.author_bio as string | undefined,
     is_published: node.data.props.is_published as boolean,
     tags: node.data.props.tags as string[],
     hero_src: node.data.props.hero_src as string | undefined,
@@ -47,7 +49,10 @@ export const BlogHeaderSettings = () => {
     defaultValues: {
       title,
       description,
-      author,
+      author_profile: {
+        name: author_name,
+        bio: author_bio ?? "",
+      },
       is_published: is_published ?? false,
       tags: tags ?? [],
     },
@@ -148,25 +153,47 @@ export const BlogHeaderSettings = () => {
       />
 
       <Controller
-        name="author"
+        name="author_profile.name"
         control={control}
         render={({ field }) => (
-          <TextField isInvalid={!!errors.author} isRequired>
-            <Label>Author</Label>
+          <TextField isInvalid={!!errors.author_profile?.name} isRequired>
+            <Label>Author name</Label>
             <Input
               {...field}
               onChange={(e) => {
                 field.onChange(e);
                 setProp((props: BlogHeaderElementProps) => {
-                  props.author = e.target.value;
+                  props.author_name = e.target.value;
                 });
               }}
             />
-            {errors.author && (
+            {errors.author_profile?.name && (
               <span className="text-xs text-danger">
-                {errors.author.message}
+                {errors.author_profile.name.message}
               </span>
             )}
+          </TextField>
+        )}
+      />
+
+      <Controller
+        name="author_profile.bio"
+        control={control}
+        render={({ field }) => (
+          <TextField>
+            <Label>Author bio</Label>
+            <textarea
+              {...field}
+              value={field.value || ""}
+              onChange={(e) => {
+                field.onChange(e);
+                setProp((props: BlogHeaderElementProps) => {
+                  props.author_bio = e.target.value;
+                });
+              }}
+              className="w-full px-3 py-2 border border-border rounded-md bg-field-background text-field-foreground"
+              rows={3}
+            />
           </TextField>
         )}
       />
