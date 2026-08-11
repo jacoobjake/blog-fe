@@ -1,5 +1,6 @@
 "use client";
 
+import AuthorProfileSelect from "@/components/forms/fields/author-profile-select";
 import { UpdateBlogMetadataDto, UpdateBlogMetadataSchema } from "@/lib/schemas/blog";
 import { Blog } from "@/lib/types";
 import { formatError } from "@/lib/utils/api-error";
@@ -36,10 +37,7 @@ export default function BlogDetailsForm({
   } = useForm({
     defaultValues: {
       title: blog.title,
-      author_profile: {
-        name: blog.author_profile.name,
-        bio: blog.author_profile.bio ?? "",
-      },
+      author_profile_id: Number(blog.author_profile.id),
       description: blog.description ?? "",
       tags: blog.tags.map((t) => t.name || ""),
     },
@@ -82,39 +80,21 @@ export default function BlogDetailsForm({
         )}
       />
       <Controller
-        name="author_profile.name"
+        name="author_profile_id"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField
+          <AuthorProfileSelect
+            value={
+              typeof field.value === "number" ? field.value : null
+            }
+            onChange={(profile) =>
+              field.onChange(profile ? Number(profile.id) : undefined)
+            }
+            onBlur={field.onBlur}
             isInvalid={fieldState.invalid}
-            aria-label="Author name"
-            type="text"
-          >
-            <Label>Author name</Label>
-            <Input {...field} disabled={readOnly} />
-            <FieldError>{fieldState.error?.message}</FieldError>
-          </TextField>
-        )}
-      />
-      <Controller
-        name="author_profile.bio"
-        control={control}
-        render={({ field, fieldState }) => (
-          <TextField
-            isInvalid={fieldState.invalid}
-            aria-label="Author bio"
-            type="text"
-          >
-            <Label>Author bio</Label>
-            <textarea
-              {...field}
-              value={field.value ?? ""}
-              disabled={readOnly}
-              className="w-full px-3 py-2 border border-border rounded-md bg-field-background text-field-foreground"
-              rows={3}
-            />
-            <FieldError>{fieldState.error?.message}</FieldError>
-          </TextField>
+            errorMessage={fieldState.error?.message}
+            isDisabled={readOnly}
+          />
         )}
       />
       <Controller

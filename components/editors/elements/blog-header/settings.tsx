@@ -7,6 +7,7 @@ import * as z from "zod";
 import { BlogHeaderSchema } from "@/lib/schemas/blog";
 import { Surface, TextField, Label, Input, Checkbox, Button } from "@heroui/react";
 import TagsField from "@/components/forms/fields/tags-field";
+import AuthorProfileSelect from "@/components/forms/fields/author-profile-select";
 import {
   AssetManagerModal,
   useAssetManagerModal,
@@ -18,6 +19,7 @@ export const BlogHeaderSettings = () => {
   const {
     title,
     description,
+    author_profile_id,
     author_name,
     author_bio,
     is_published,
@@ -28,6 +30,7 @@ export const BlogHeaderSettings = () => {
   } = useNode((node) => ({
     title: node.data.props.title as string,
     description: node.data.props.description as string | undefined,
+    author_profile_id: node.data.props.author_profile_id as number | undefined,
     author_name: node.data.props.author_name as string,
     author_bio: node.data.props.author_bio as string | undefined,
     is_published: node.data.props.is_published as boolean,
@@ -49,10 +52,7 @@ export const BlogHeaderSettings = () => {
     defaultValues: {
       title,
       description,
-      author_profile: {
-        name: author_name,
-        bio: author_bio ?? "",
-      },
+      author_profile_id,
       is_published: is_published ?? false,
       tags: tags ?? [],
     },
@@ -153,48 +153,27 @@ export const BlogHeaderSettings = () => {
       />
 
       <Controller
-        name="author_profile.name"
+        name="author_profile_id"
         control={control}
-        render={({ field }) => (
-          <TextField isInvalid={!!errors.author_profile?.name} isRequired>
-            <Label>Author name</Label>
-            <Input
-              {...field}
-              onChange={(e) => {
-                field.onChange(e);
-                setProp((props: BlogHeaderElementProps) => {
-                  props.author_name = e.target.value;
-                });
-              }}
-            />
-            {errors.author_profile?.name && (
-              <span className="text-xs text-danger">
-                {errors.author_profile.name.message}
-              </span>
-            )}
-          </TextField>
-        )}
-      />
-
-      <Controller
-        name="author_profile.bio"
-        control={control}
-        render={({ field }) => (
-          <TextField>
-            <Label>Author bio</Label>
-            <textarea
-              {...field}
-              value={field.value || ""}
-              onChange={(e) => {
-                field.onChange(e);
-                setProp((props: BlogHeaderElementProps) => {
-                  props.author_bio = e.target.value;
-                });
-              }}
-              className="w-full px-3 py-2 border border-border rounded-md bg-field-background text-field-foreground"
-              rows={3}
-            />
-          </TextField>
+        render={({ field, fieldState }) => (
+          <AuthorProfileSelect
+            value={
+              typeof field.value === "number" ? field.value : null
+            }
+            onChange={(profile) => {
+              field.onChange(profile ? Number(profile.id) : undefined);
+              setProp((props: BlogHeaderElementProps) => {
+                props.author_profile_id = profile
+                  ? Number(profile.id)
+                  : undefined;
+                props.author_name = profile?.name ?? "Anonymous";
+                props.author_bio = profile?.bio ?? "";
+              });
+            }}
+            onBlur={field.onBlur}
+            isInvalid={fieldState.invalid}
+            errorMessage={fieldState.error?.message}
+          />
         )}
       />
 

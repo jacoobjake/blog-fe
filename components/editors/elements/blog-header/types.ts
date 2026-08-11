@@ -1,6 +1,7 @@
 export type BlogHeaderElementProps = {
   title: string;
   description?: string;
+  author_profile_id?: number;
   author_name: string;
   author_bio?: string;
   is_published: boolean;

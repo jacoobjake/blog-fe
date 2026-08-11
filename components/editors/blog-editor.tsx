@@ -1,6 +1,7 @@
 "use client";
 
 import { Blog, BlogContentType } from "@/lib/types";
+import type { AuthorProfile } from "@/lib/types";
 import type { BlogHeaderElementProps } from "./elements/blog-header/types";
 import { Editor, Frame, useEditor } from "@craftjs/core";
 import {
@@ -21,12 +22,12 @@ import lz from "lz-string";
 import RightBar from "./toolbars/right-bar";
 import LeftBar from "./toolbars/left-bar";
 import { RenderNode } from "./render-node";
-import { useAuthStore } from "@/hooks/auth";
 import { useBlogEditorCrumbs, useBlogHeaderTitle } from "@/hooks/editors";
 import { PublicBreadcrumbsList } from "@/components/nav/public/breadcrumbs";
 
 type BlogEditorProps = {
   blog?: Blog;
+  defaultAuthorProfile?: AuthorProfile | null;
 };
 
 function deserializeBlogContent(blog: Blog) {
@@ -43,7 +44,7 @@ function deserializeBlogContent(blog: Blog) {
   }
 };
 
-export default function BlogEditor({ blog }: BlogEditorProps) {
+export default function BlogEditor({ blog, defaultAuthorProfile }: BlogEditorProps) {
   const router = useRouter();
   const [isPreview, setIsPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -69,12 +70,16 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
 
       const title = blogHeaderNode?.data.props.title || "";
       const description = blogHeaderNode?.data.props.description || "";
-      const author_name = blogHeaderNode?.data.props.author_name || "";
-      const author_bio = blogHeaderNode?.data.props.author_bio || "";
+      const author_profile_id = blogHeaderNode?.data.props.author_profile_id;
       const tags = blogHeaderNode?.data.props.tags || [];
       const is_published = blogHeaderNode?.data.props.is_published || false;
       const hero_asset_uuid =
         blogHeaderNode?.data.props.hero_asset_uuid || null;
+
+      if (!author_profile_id) {
+        alert("Please select an author profile before saving.");
+        return;
+      }
 
       // Compress the JSON content
       const compressed = lz.compressToBase64(json);
@@ -82,10 +87,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
       const payload = {
         title: title.trim(),
         description: description.trim() || null,
-        author_profile: {
-          name: author_name.trim(),
-          bio: author_bio.trim() || null,
-        },
+        author_profile_id,
         json_content: {
           type: BlogContentType.CompressedBase64,
           body: compressed,
@@ -121,6 +123,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
     <EditorContainer enabled={!isPreview} >
       <EditorContent
         blog={blog}
+        defaultAuthorProfile={defaultAuthorProfile}
         isPreview={isPreview}
         isSaving={isSaving}
         onPreview={handlePreview}
@@ -170,19 +173,20 @@ function BlogEditorBreadcrumbs({
 
 function EditorContent({
   blog,
+  defaultAuthorProfile,
   isPreview,
   isSaving,
   onPreview,
   onFinish,
 }: {
   blog?: Blog;
+  defaultAuthorProfile?: AuthorProfile | null;
   isPreview: boolean;
   isSaving: boolean;
   onPreview: () => void;
   onFinish: (query: any, actions: any) => Promise<void>;
 }) {
   const { query, actions } = useEditor();
-  const user = useAuthStore((s) => s.user ?? undefined);
   const title = useBlogHeaderTitle();
 
   useEffect(() => {
@@ -212,7 +216,8 @@ function EditorContent({
         props.hero_object_position = props.hero_object_position ?? "50% 50%";
       }
 
-      if (blog.author_profile?.name) {
+      if (blog.author_profile) {
+        props.author_profile_id = Number(blog.author_profile.id);
         props.author_name = blog.author_profile.name;
         props.author_bio = blog.author_profile.bio ?? "";
       }
@@ -240,7 +245,7 @@ function EditorContent({
         <div className="flex-1 overflow-y-auto page-container w-full max-w-5xl mx-auto p-6">
           <BlogEditorBreadcrumbs slug={blog?.slug} title={title} />
           <Frame data={blog ? deserializeBlogContent(blog) : undefined}>
-            <RootCanvas user={user} />
+            <RootCanvas defaultAuthorProfile={defaultAuthorProfile} />
           </Frame>
         </div>
 

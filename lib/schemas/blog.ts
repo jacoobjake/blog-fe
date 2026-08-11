@@ -8,20 +8,15 @@ const JsonContentSchema = z.union([
   }),
 ]);
 
-const AuthorProfileSchema = z.object({
-  name: z
-    .string()
-    .min(1, "Author name is required")
-    .max(255, "Author name must be less than 255 characters"),
-  bio: z.string().nullable().optional(),
-});
-
 export const BlogHeaderSchema = z.object({
   title: z
     .string()
     .min(1, "Title is required")
     .max(255, "Title must be less than 255 characters"),
-  author_profile: AuthorProfileSchema,
+  author_profile_id: z.coerce
+    .number()
+    .int()
+    .positive("Author profile is required"),
   description: z.string().optional(),
   is_published: z.boolean().default(false),
   tags: z
@@ -36,7 +31,7 @@ export const CreateBlogSchema = z.object({
   description: z.string().nullable().optional(),
   json_content: JsonContentSchema,
   hero_asset_uuid: z.string().uuid().nullable().optional(),
-  author_profile: AuthorProfileSchema,
+  author_profile_id: z.number().int().positive(),
   is_published: z.boolean().default(false),
   tags: z.array(z.string()).nullable(),
 });
@@ -52,7 +47,10 @@ export const UpdateBlogMetadataSchema = z.object({
     .string()
     .min(1, "Title is required")
     .max(255, "Title must be less than 255 characters"),
-  author_profile: AuthorProfileSchema,
+  author_profile_id: z.coerce
+    .number()
+    .int()
+    .positive("Author profile is required"),
   description: z.string().nullable().optional(),
   tags: z
     .array(z.string().max(255, "Each tag must be less than 255 characters"))

@@ -1,13 +1,15 @@
 "use client";
 
-import { ADMIN_NAV_ROUTES } from "@/constants/routes";
 import { generateCrumbs } from "@/lib/utils/route";
+import { getAdminNavRoutes } from "@/lib/utils/admin-nav";
 import { Breadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/auth";
 
 export default function AdminBreadcrumbs() {
   const pathname = usePathname();
-  const crumbs = generateCrumbs(pathname, ADMIN_NAV_ROUTES);
+  const { user } = useAuth();
+  const crumbs = generateCrumbs(pathname, getAdminNavRoutes(user));
   return (
     <Breadcrumbs>
       {crumbs.map((crumb, index) => (

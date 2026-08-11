@@ -1,18 +1,21 @@
 "use client";
 
 import { getIcon } from "@/lib/resolvers/icon-resolver";
-import { ADMIN_NAV_ROUTES } from "@/constants/routes";
+import { getAdminNavRoutes } from "@/lib/utils/admin-nav";
 import { Button, cn, Link, Separator } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { useAdminNav } from "@/hooks/nav";
 import { TbLayoutSidebarLeftCollapse } from "react-icons/tb";
 import { matchesRoutePattern } from "@/lib/utils/route";
+import { useAuth } from "@/hooks/auth";
 
 export default function AdminSideMenu() {
   const isSideMenuOpen = useAdminNav((state) => state.isSideMenuOpen);
   const setIsSideMenuOpen = useAdminNav((state) => state.setIsSideMenuOpen);
   const pathname = usePathname();
+  const { user } = useAuth();
+  const navRoutes = getAdminNavRoutes(user);
 
   const isActivePath = (pattern: string) =>
     matchesRoutePattern(pathname, pattern);
@@ -37,7 +40,7 @@ export default function AdminSideMenu() {
       <Separator className="w-5/6 mx-auto" />
       <nav>
         <ul className="flex flex-col space-y-4 text-xl items-start p-4">
-          {ADMIN_NAV_ROUTES.map((route) => (
+          {navRoutes.map((route) => (
             <Link
               key={route.href}
               className={cn(
