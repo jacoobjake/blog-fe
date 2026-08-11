@@ -27,8 +27,8 @@ export function createAuthorApi(fetcher: ApiFetcher) {
   const { get, post, put, del } = createHttpMethods(fetcher);
 
   const authorProfilesQuery = `
-    query AuthorProfiles($first: Int!, $page: Int!, $name: String) {
-      authorProfiles(first: $first, page: $page, name: $name, orderBy: [{ column: NAME, order: ASC }]) {
+    query AuthorProfiles($first: Int!, $page: Int!, $name: String, $orderBy: [QueryAuthorProfilesOrderByOrderByClause!]) {
+      authorProfiles(first: $first, page: $page, name: $name, orderBy: $orderBy) {
         data {
           ${authorFields}
         }
@@ -53,7 +53,12 @@ export function createAuthorApi(fetcher: ApiFetcher) {
     },
 
     listAuthorProfiles: async (
-      variables: { first?: number; page?: number; name?: string } = {},
+      variables: {
+        first?: number;
+        page?: number;
+        name?: string;
+        orderBy?: { column: string; order: "ASC" | "DESC" }[];
+      } = {},
     ) => {
       const response = await gql.request<{
         authorProfiles: GraphqlResponseWithPaginatorInfo<AuthorProfile>;
@@ -61,6 +66,7 @@ export function createAuthorApi(fetcher: ApiFetcher) {
         first: variables.first ?? 50,
         page: variables.page ?? 1,
         name: variables.name,
+        orderBy: variables.orderBy ?? [{ column: "NAME", order: "ASC" }],
       });
 
       return response.authorProfiles;
