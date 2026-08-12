@@ -1,27 +1,25 @@
 "use client";
 
 import AuthorProfileForm from "@/components/forms/authors/author-profile-form";
-import { deleteAuthorAction, updateAuthorAction } from "@/lib/actions/authors";
+import { updateAuthorAction } from "@/lib/actions/authors";
 import type {
   CreateAuthorProfileDto,
   UpdateAuthorProfileDto,
 } from "@/lib/schemas/author-profile";
 import type { AuthorProfile } from "@/lib/types";
-import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const FORM_ID = "author-profile-form";
-
 type EditAuthorPageContentProps = {
   author: AuthorProfile;
+  formId: string;
 };
 
 export default function EditAuthorPageContent({
   author,
+  formId,
 }: EditAuthorPageContentProps) {
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (
@@ -38,53 +36,16 @@ export default function EditAuthorPageContent({
     router.refresh();
   };
 
-  const handleDelete = async () => {
-    if (!confirm(`Delete author profile "${author.name}"?`)) {
-      return;
-    }
-
-    setIsDeleting(true);
-    try {
-      await deleteAuthorAction(author.id);
-      router.push("/admin/authors");
-      router.refresh();
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
   return (
-    <>
-      <div data-slot-container>
-        <Button
-          type="submit"
-          form={FORM_ID}
-          data-slot="extra-actions"
-          data-slot-priority={10}
-        >
-          Save changes
-        </Button>
-        <Button
-          variant="outline"
-          onPress={handleDelete}
-          isPending={isDeleting}
-          data-slot="extra-actions"
-          data-slot-priority={20}
-          className="text-danger border-danger"
-        >
-          Delete author profile
-        </Button>
-      </div>
-      <div className="space-y-4">
-        {successMessage && (
-          <p className="text-sm text-success">{successMessage}</p>
-        )}
-        <AuthorProfileForm
-          author={author}
-          formId={FORM_ID}
-          onSubmit={handleSubmit}
-        />
-      </div>
-    </>
+    <div className="space-y-4">
+      {successMessage && (
+        <p className="text-sm text-success">{successMessage}</p>
+      )}
+      <AuthorProfileForm
+        author={author}
+        formId={formId}
+        onSubmit={handleSubmit}
+      />
+    </div>
   );
 }

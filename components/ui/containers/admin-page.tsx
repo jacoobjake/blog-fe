@@ -139,7 +139,7 @@ export default function PageContainer({
           {preAction}
           <h1 className="text-2xl font-bold">{title}</h1>
         </div>
-        <div>{extraActions}</div>
+        <div className="flex items-center gap-2">{extraActions}</div>
       </div>
       <div className={cn("grow", contentClassName)}>{content}</div>
     </div>
