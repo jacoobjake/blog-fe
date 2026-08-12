@@ -11,6 +11,8 @@ import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+const FORM_ID = "author-profile-form";
+
 type EditAuthorPageContentProps = {
   author: AuthorProfile;
 };
@@ -20,6 +22,7 @@ export default function EditAuthorPageContent({
 }: EditAuthorPageContentProps) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (
     data: CreateAuthorProfileDto | UpdateAuthorProfileDto,
@@ -31,6 +34,7 @@ export default function EditAuthorPageContent({
     }
 
     await updateAuthorAction(author.id, payload);
+    setSuccessMessage("Author profile updated successfully.");
     router.refresh();
   };
 
@@ -50,20 +54,37 @@ export default function EditAuthorPageContent({
   };
 
   return (
-    <div className="space-y-6">
-      <AuthorProfileForm
-        author={author}
-        onSubmit={handleSubmit}
-        submitLabel="Save changes"
-      />
-      <Button
-        variant="outline"
-        onPress={handleDelete}
-        isPending={isDeleting}
-        className="text-danger border-danger"
-      >
-        Delete author profile
-      </Button>
-    </div>
+    <>
+      <div data-slot-container>
+        <Button
+          type="submit"
+          form={FORM_ID}
+          data-slot="extra-actions"
+          data-slot-priority={10}
+        >
+          Save changes
+        </Button>
+        <Button
+          variant="outline"
+          onPress={handleDelete}
+          isPending={isDeleting}
+          data-slot="extra-actions"
+          data-slot-priority={20}
+          className="text-danger border-danger"
+        >
+          Delete author profile
+        </Button>
+      </div>
+      <div className="space-y-4">
+        {successMessage && (
+          <p className="text-sm text-success">{successMessage}</p>
+        )}
+        <AuthorProfileForm
+          author={author}
+          formId={FORM_ID}
+          onSubmit={handleSubmit}
+        />
+      </div>
+    </>
   );
 }

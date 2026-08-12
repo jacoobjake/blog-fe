@@ -9,12 +9,15 @@ import {
 import type { AuthorProfile } from "@/lib/types";
 import { formatError } from "@/lib/utils/api-error";
 import {
-  Button,
   ErrorMessage,
   FieldError,
   Form,
   Input,
   Label,
+  ListBox,
+  Select,
+  Surface,
+  TextArea,
   TextField,
 } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,7 +32,6 @@ type AuthorProfileFormProps = {
   onSubmit: (
     data: CreateAuthorProfileDto | UpdateAuthorProfileDto,
   ) => Promise<void>;
-  submitLabel?: string;
   allowUserLinking?: boolean;
 };
 
@@ -39,6 +41,14 @@ type UserOption = {
   email: string;
 };
 
+type UserLinkMode = "none" | "existing" | "new";
+
+const USER_LINK_OPTIONS: { id: UserLinkMode; label: string }[] = [
+  { id: "none", label: "No linked user" },
+  { id: "existing", label: "Link existing user" },
+  { id: "new", label: "Create new user" },
+];
+
 const fetcher = createBrowserFetcher();
 const gql = createGraphqlClient(fetcher);
 
@@ -46,11 +56,10 @@ export default function AuthorProfileForm({
   author,
   formId = "author-profile-form",
   onSubmit,
-  submitLabel = "Save author",
   allowUserLinking = true,
 }: AuthorProfileFormProps) {
   const schema = author ? UpdateAuthorProfileSchema : CreateAuthorProfileSchema;
-  const defaultLink = author?.user ? "existing" : "none";
+  const defaultLink: UserLinkMode = author?.user ? "existing" : "none";
   const [users, setUsers] = useState<UserOption[]>([]);
 
   const {
@@ -65,7 +74,7 @@ export default function AuthorProfileForm({
       bio: author?.bio ?? "",
       user: author?.user
         ? { link: "existing" as const, user_id: Number(author.user.id) }
-        : { link: defaultLink as "none" },
+        : { link: defaultLink },
     },
     resolver: zodResolver(schema),
   });
@@ -97,8 +106,7 @@ export default function AuthorProfileForm({
   const userOptions = useMemo(
     () =>
       users.filter(
-        (user) =>
-          !author?.user || user.id !== author.user?.id,
+        (user) => !author?.user || user.id !== author.user?.id,
       ),
     [users, author?.user],
   );
@@ -117,7 +125,7 @@ export default function AuthorProfileForm({
     }
   };
 
-  const { errors, isSubmitting } = formState;
+  const { errors } = formState;
 
   return (
     <Form
@@ -129,7 +137,7 @@ export default function AuthorProfileForm({
         name="name"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField isInvalid={fieldState.invalid} aria-label="Name" type="text">
+          <TextField isInvalid={fieldState.invalid} isRequired>
             <Label>Name</Label>
             <Input {...field} />
             <FieldError>{fieldState.error?.message}</FieldError>
@@ -141,13 +149,13 @@ export default function AuthorProfileForm({
         name="bio"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField isInvalid={fieldState.invalid} aria-label="Bio" type="text">
+          <TextField isInvalid={fieldState.invalid}>
             <Label>Bio</Label>
-            <textarea
+            <TextArea
               {...field}
               value={field.value ?? ""}
-              className="w-full px-3 py-2 border border-border rounded-md bg-field-background text-field-foreground"
               rows={4}
+              fullWidth
             />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
@@ -158,39 +166,54 @@ export default function AuthorProfileForm({
         <Controller
           name="user.link"
           control={control}
-          render={({ field }) => (
-            <TextField aria-label="User account">
+          render={({ field, fieldState }) => (
+            <Select
+              isInvalid={fieldState.invalid}
+              value={field.value ?? "none"}
+              onChange={(value) => {
+                const link = value as UserLinkMode;
+                field.onChange(link);
+
+                if (link === "none") {
+                  setValue("user", { link: "none" });
+                  return;
+                }
+
+                if (link === "existing") {
+                  setValue("user", { link: "existing", user_id: 0 });
+                  return;
+                }
+
+                setValue("user", {
+                  link: "new",
+                  name: "",
+                  email: "",
+                  password: "",
+                  roles: ["author"],
+                });
+              }}
+            >
               <Label>User account</Label>
-              <select
-                className="w-full px-3 py-2 border border-border rounded-md bg-field-background"
-                value={field.value ?? "none"}
-                onChange={(event) => {
-                  const value = event.target.value;
-
-                  if (value === "none") {
-                    setValue("user", { link: "none" });
-                    return;
-                  }
-
-                  if (value === "existing") {
-                    setValue("user", { link: "existing", user_id: 0 });
-                    return;
-                  }
-
-                  setValue("user", {
-                    link: "new",
-                    name: "",
-                    email: "",
-                    password: "",
-                    roles: ["author"],
-                  });
-                }}
-              >
-                <option value="none">No linked user</option>
-                <option value="existing">Link existing user</option>
-                <option value="new">Create new user</option>
-              </select>
-            </TextField>
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {USER_LINK_OPTIONS.map((option) => (
+                    <ListBox.Item
+                      key={option.id}
+                      id={option.id}
+                      textValue={option.label}
+                    >
+                      {option.label}
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+              <FieldError>{fieldState.error?.message}</FieldError>
+            </Select>
           )}
         />
       )}
@@ -200,24 +223,32 @@ export default function AuthorProfileForm({
           name="user.user_id"
           control={control}
           render={({ field, fieldState }) => (
-            <TextField isInvalid={fieldState.invalid} aria-label="User">
+            <Select
+              isInvalid={fieldState.invalid}
+              value={field.value ? String(field.value) : ""}
+              onChange={(value) => field.onChange(Number(value) || undefined)}
+            >
               <Label>Existing user</Label>
-              <select
-                className="w-full px-3 py-2 border border-border rounded-md bg-field-background"
-                value={field.value ? String(field.value) : ""}
-                onChange={(event) =>
-                  field.onChange(Number(event.target.value) || undefined)
-                }
-              >
-                <option value="">Select a user</option>
-                {userOptions.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.name} ({user.email})
-                  </option>
-                ))}
-              </select>
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox>
+                  {userOptions.map((user) => (
+                    <ListBox.Item
+                      key={user.id}
+                      id={user.id}
+                      textValue={`${user.name} (${user.email})`}
+                    >
+                      {user.name} ({user.email})
+                      <ListBox.ItemIndicator />
+                    </ListBox.Item>
+                  ))}
+                </ListBox>
+              </Select.Popover>
               <FieldError>{fieldState.error?.message}</FieldError>
-            </TextField>
+            </Select>
           )}
         />
       )}
@@ -228,7 +259,7 @@ export default function AuthorProfileForm({
             name="user.name"
             control={control}
             render={({ field, fieldState }) => (
-              <TextField isInvalid={fieldState.invalid} aria-label="User name">
+              <TextField isInvalid={fieldState.invalid} isRequired>
                 <Label>User name</Label>
                 <Input {...field} />
                 <FieldError>{fieldState.error?.message}</FieldError>
@@ -239,7 +270,7 @@ export default function AuthorProfileForm({
             name="user.email"
             control={control}
             render={({ field, fieldState }) => (
-              <TextField isInvalid={fieldState.invalid} aria-label="User email">
+              <TextField isInvalid={fieldState.invalid} isRequired>
                 <Label>User email</Label>
                 <Input {...field} type="email" />
                 <FieldError>{fieldState.error?.message}</FieldError>
@@ -250,10 +281,7 @@ export default function AuthorProfileForm({
             name="user.password"
             control={control}
             render={({ field, fieldState }) => (
-              <TextField
-                isInvalid={fieldState.invalid}
-                aria-label="User password"
-              >
+              <TextField isInvalid={fieldState.invalid} isRequired>
                 <Label>User password</Label>
                 <Input {...field} type="password" />
                 <FieldError>{fieldState.error?.message}</FieldError>
@@ -264,11 +292,11 @@ export default function AuthorProfileForm({
       )}
 
       {author?.user && (
-        <div className="rounded-md border border-border p-4 text-sm space-y-1">
+        <Surface className="p-4 space-y-1">
           <p className="font-medium">Linked user</p>
           <p>{author.user.name}</p>
-          <p className="text-muted">{author.user.email}</p>
-        </div>
+          <p className="text-sm text-muted">{author.user.email}</p>
+        </Surface>
       )}
 
       {errors.root?.serverError && (
@@ -276,10 +304,6 @@ export default function AuthorProfileForm({
           <ErrorMessage>{errors.root.serverError.message}</ErrorMessage>
         </p>
       )}
-
-      <Button type="submit" isPending={isSubmitting}>
-        {submitLabel}
-      </Button>
     </Form>
   );
 }

@@ -7,12 +7,12 @@ import {
 import type { AuthorProfile } from "@/lib/types";
 import { formatError } from "@/lib/utils/api-error";
 import {
-  Button,
   ErrorMessage,
   FieldError,
   Form,
   Input,
   Label,
+  TextArea,
   TextField,
 } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,11 +20,13 @@ import { Controller, useForm } from "react-hook-form";
 
 type OwnAuthorProfileFormProps = {
   author: AuthorProfile;
+  formId?: string;
   onSubmit: (data: UpdateOwnAuthorProfileDto) => Promise<void>;
 };
 
 export default function OwnAuthorProfileForm({
   author,
+  formId = "own-author-profile-form",
   onSubmit,
 }: OwnAuthorProfileFormProps) {
   const {
@@ -52,10 +54,11 @@ export default function OwnAuthorProfileForm({
     }
   };
 
-  const { errors, isSubmitting } = formState;
+  const { errors } = formState;
 
   return (
     <Form
+      id={formId}
       className="w-full max-w-2xl space-y-4"
       onSubmit={handleSubmit(handleFormSubmit)}
     >
@@ -63,7 +66,7 @@ export default function OwnAuthorProfileForm({
         name="name"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField isInvalid={fieldState.invalid} aria-label="Name" type="text">
+          <TextField isInvalid={fieldState.invalid} isRequired>
             <Label>Name</Label>
             <Input {...field} />
             <FieldError>{fieldState.error?.message}</FieldError>
@@ -75,13 +78,13 @@ export default function OwnAuthorProfileForm({
         name="bio"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField isInvalid={fieldState.invalid} aria-label="Bio" type="text">
+          <TextField isInvalid={fieldState.invalid}>
             <Label>Bio</Label>
-            <textarea
+            <TextArea
               {...field}
               value={field.value ?? ""}
-              className="w-full px-3 py-2 border border-border rounded-md bg-field-background text-field-foreground"
               rows={4}
+              fullWidth
             />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
@@ -93,10 +96,6 @@ export default function OwnAuthorProfileForm({
           <ErrorMessage>{errors.root.serverError.message}</ErrorMessage>
         </p>
       )}
-
-      <Button type="submit" isPending={isSubmitting}>
-        Save profile
-      </Button>
     </Form>
   );
 }
