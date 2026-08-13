@@ -8,8 +8,7 @@ export type BlogListFilters = {
 export type BlogOrderByColumn =
   | "created_at"
   | "updated_at"
-  | "title"
-  | "author";
+  | "title";
 
 export type BlogOrderByClause = {
   column: BlogOrderByColumn;
@@ -41,7 +40,6 @@ export function sortingStateToOrderBy(
     "created_at",
     "updated_at",
     "title",
-    "author",
   ];
 
   if (!allowed.includes(first.id as BlogOrderByColumn)) {

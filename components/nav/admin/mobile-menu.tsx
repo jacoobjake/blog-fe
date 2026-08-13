@@ -2,7 +2,7 @@
 
 import { ThemeSwitch } from "@/components/ui/theme";
 import { getIcon } from "@/lib/resolvers/icon-resolver";
-import { ADMIN_NAV_ROUTES } from "@/constants/routes";
+import { getAdminNavRoutes } from "@/lib/utils/admin-nav";
 import {
   Button,
   CloseButton,
@@ -15,10 +15,13 @@ import {
 import { RxHamburgerMenu } from "react-icons/rx";
 import { usePathname } from "next/navigation";
 import { matchesRoutePattern } from "@/lib/utils/route";
+import { useAuth } from "@/hooks/auth";
 
 export default function MobileMenu() {
   const { isOpen, open, close, setOpen } = useOverlayState();
   const pathname = usePathname();
+  const { user } = useAuth();
+  const navRoutes = getAdminNavRoutes(user);
 
   const isActivePath = (pattern: string) =>
     matchesRoutePattern(pathname, pattern);
@@ -76,7 +79,7 @@ export default function MobileMenu() {
             </Modal.Header>
             <Separator />
             <Modal.Body className="flex flex-col items-start gap-6">
-              {ADMIN_NAV_ROUTES.map((route) => (
+              {navRoutes.map((route) => (
                 <div key={route.href}>
                   <Link
                     className={cn(

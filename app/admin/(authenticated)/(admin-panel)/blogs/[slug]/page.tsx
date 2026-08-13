@@ -1,6 +1,7 @@
 import { BackButton } from "@/components/nav";
-import { AdminPage } from "@/components/ui/containers";
 import BlogDetailsPageContent from "@/components/forms/blogs/blog-details-page-content";
+import BlogDetailsToolbar from "@/components/forms/blogs/blog-details-toolbar";
+import { AdminPage, AdminPageSection } from "@/components/ui/containers";
 import { getServerBlogApi } from "@/lib/apis/server";
 
 export default async function BlogDetailsPage({
@@ -14,7 +15,10 @@ export default async function BlogDetailsPage({
   return (
     <AdminPage title="Blog Details">
       <BackButton href="/admin/blogs" data-slot="pre-action" />
-      <BlogDetailsPageContent blog={blog} />
+      <AdminPageSection data-slot-container>
+        <BlogDetailsToolbar blog={blog} />
+        <BlogDetailsPageContent blog={blog} />
+      </AdminPageSection>
     </AdminPage>
   );
 }
