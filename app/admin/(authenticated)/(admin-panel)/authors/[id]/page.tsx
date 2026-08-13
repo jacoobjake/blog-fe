@@ -4,7 +4,7 @@ import {
   DeleteAuthorButton,
   SaveAuthorButton,
 } from "@/components/authors/author-page-actions";
-import { AdminPage } from "@/components/ui/containers";
+import { AdminPage, AdminPageSection } from "@/components/ui/containers";
 import { getServerApi } from "@/lib/apis/server";
 import { canManageAuthors } from "@/lib/utils/author-permissions";
 import { redirect } from "next/navigation";
@@ -28,18 +28,20 @@ export default async function EditAuthorPage({
   return (
     <AdminPage title={`Edit ${author.name}`}>
       <BackButton href="/admin/authors" data-slot="pre-action" />
-      <SaveAuthorButton
-        formId={FORM_ID}
-        data-slot="extra-actions"
-        data-slot-priority={10}
-      />
-      <DeleteAuthorButton
-        authorId={author.id}
-        authorName={author.name}
-        data-slot="extra-actions"
-        data-slot-priority={20}
-      />
-      <EditAuthorPageContent author={author} formId={FORM_ID} />
+      <AdminPageSection data-slot-container>
+        <SaveAuthorButton
+          formId={FORM_ID}
+          data-slot="extra-actions"
+          data-slot-priority={10}
+        />
+        <DeleteAuthorButton
+          authorId={author.id}
+          authorName={author.name}
+          data-slot="extra-actions"
+          data-slot-priority={20}
+        />
+        <EditAuthorPageContent author={author} formId={FORM_ID} />
+      </AdminPageSection>
     </AdminPage>
   );
 }

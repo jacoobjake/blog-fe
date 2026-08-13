@@ -1,6 +1,6 @@
 import MyAuthorProfilePageContent from "./my-author-profile-page-content";
 import { SaveAuthorButton } from "@/components/authors/author-page-actions";
-import { AdminPage } from "@/components/ui/containers";
+import { AdminPage, AdminPageSection } from "@/components/ui/containers";
 import { getServerApi } from "@/lib/apis/server";
 import { canManageOwnAuthorProfile } from "@/lib/utils/author-permissions";
 import { getErrorStatus } from "@/lib/utils/api-error";
@@ -21,13 +21,15 @@ export default async function MyAuthorProfilePage() {
 
     return (
       <AdminPage title="My Author Profile">
-        <SaveAuthorButton
-          formId={FORM_ID}
-          label="Save profile"
-          data-slot="extra-actions"
-          data-slot-priority={10}
-        />
-        <MyAuthorProfilePageContent author={author} formId={FORM_ID} />
+        <AdminPageSection data-slot-container>
+          <SaveAuthorButton
+            formId={FORM_ID}
+            label="Save profile"
+            data-slot="extra-actions"
+            data-slot-priority={10}
+          />
+          <MyAuthorProfilePageContent author={author} formId={FORM_ID} />
+        </AdminPageSection>
       </AdminPage>
     );
   } catch (error) {

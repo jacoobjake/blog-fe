@@ -43,6 +43,22 @@ import {
  * - `data-slot="pre-action"`: Renders before the title (e.g., back buttons)
  * - `data-slot="extra-actions"`: Renders in the header's action area (e.g., save, delete buttons)
  *
+ * Nested slots:
+ * Mark a direct child with `data-slot-container` so its **React children** (the nodes
+ * passed between its opening/closing tags) are scanned for slots. This avoids recursing
+ * into every descendant. Slotted nodes must be children of that container element in the
+ * React tree — placing `data-slot-container` on a DOM node inside a client component's
+ * render output is not visible to slot extraction.
+ *
+ * @example
+ * <AdminPage title="Edit Author">
+ *   <BackButton data-slot="pre-action" />
+ *   <AdminPageSection data-slot-container>
+ *     <Button data-slot="extra-actions">Save</Button>
+ *     <AuthorForm />
+ *   </AdminPageSection>
+ * </AdminPage>
+ *
  * Attributes:
  * - `data-slot`: The slot name ("pre-action" | "extra-actions")
  * - `data-slot-container`: Mark an element as containing slotted children (for performance)
@@ -99,7 +115,11 @@ function extractSlots(children: ReactNode) {
 
       // Only clone if children changed
       if (hasChanges) {
-        return cloneElement(element, {}, processedChildren);
+        return cloneElement(
+          element,
+          {},
+          Children.toArray(processedChildren).filter(Boolean),
+        );
       }
     }
 
