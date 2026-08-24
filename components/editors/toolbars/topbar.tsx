@@ -1,7 +1,16 @@
 "use client";
 
-import { Button } from "@heroui/react";
-import { FiCheck, FiChevronLeft, FiEye, FiEyeOff } from "react-icons/fi";
+import { Button, Tooltip } from "@heroui/react";
+import {
+  FiAlertCircle,
+  FiCheck,
+  FiCheckCircle,
+  FiChevronLeft,
+  FiCloud,
+  FiEye,
+  FiEyeOff,
+  FiLoader,
+} from "react-icons/fi";
 import { useRouter } from "next/navigation";
 
 import type { AutoSaveStatus } from "@/hooks/editors";
@@ -16,25 +25,73 @@ type TopbarProps = {
   hasUnsavedChanges?: boolean;
 };
 
-function formatSavedAt(date: Date) {
-  return date.toLocaleTimeString([], {
+function formatLastSavedAt(date: Date) {
+  return date.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
     hour: "numeric",
     minute: "2-digit",
   });
 }
 
-function getAutoSaveLabel(
+function getAutoSaveTooltip(
   autoSaveStatus: AutoSaveStatus,
   lastSavedAt: Date | null | undefined,
   hasUnsavedChanges: boolean,
 ) {
   if (autoSaveStatus === "saving") return "Auto-saving...";
+  if (autoSaveStatus === "error") return "Auto-save failed";
   if (autoSaveStatus === "pending" || hasUnsavedChanges) {
     return "Unsaved changes";
   }
-  if (autoSaveStatus === "error") return "Auto-save failed";
-  if (lastSavedAt) return `Saved at ${formatSavedAt(lastSavedAt)}`;
+  if (lastSavedAt) return `Last saved ${formatLastSavedAt(lastSavedAt)}`;
   return "All changes saved";
+}
+
+function AutoSaveStatusIcon({
+  autoSaveStatus,
+  lastSavedAt,
+  hasUnsavedChanges,
+}: {
+  autoSaveStatus: AutoSaveStatus;
+  lastSavedAt: Date | null | undefined;
+  hasUnsavedChanges: boolean;
+}) {
+  const tooltip = getAutoSaveTooltip(
+    autoSaveStatus,
+    lastSavedAt,
+    hasUnsavedChanges,
+  );
+  const isSaving = autoSaveStatus === "saving";
+  const isError = autoSaveStatus === "error";
+  const isPending = autoSaveStatus === "pending" || hasUnsavedChanges;
+
+  const icon = isSaving ? (
+    <FiLoader className="size-4 shrink-0 animate-spin text-muted" />
+  ) : isError ? (
+    <FiAlertCircle className="size-4 shrink-0 text-danger" />
+  ) : isPending ? (
+    <FiCloud className="size-4 shrink-0 text-muted" />
+  ) : (
+    <FiCheckCircle className="size-4 shrink-0 text-success" />
+  );
+
+  return (
+    <Tooltip>
+      <Button
+        variant="ghost"
+        size="sm"
+        isIconOnly
+        aria-label={tooltip}
+        className="cursor-default"
+        data-testid="auto-save-status"
+      >
+        {icon}
+      </Button>
+      <Tooltip.Content>{tooltip}</Tooltip.Content>
+    </Tooltip>
+  );
 }
 
 export const Topbar = ({
@@ -52,15 +109,9 @@ export const Topbar = ({
     router.push("/admin/blogs");
   };
 
-  const autoSaveLabel = getAutoSaveLabel(
-    autoSaveStatus,
-    lastSavedAt,
-    hasUnsavedChanges,
-  );
-
   return (
     <div className="w-full h-14 bg-surface border-b border-separator flex justify-between items-center px-4">
-      <div className="flex items-center gap-3">
+      <div>
         <Button
           aria-label="Go Back"
           variant="ghost"
@@ -70,17 +121,15 @@ export const Topbar = ({
           <FiChevronLeft className="size-4 shrink-0" />
           Back
         </Button>
-        {!isPreview && (
-          <span
-            className="text-xs text-muted"
-            aria-live="polite"
-            data-testid="auto-save-status"
-          >
-            {autoSaveLabel}
-          </span>
-        )}
       </div>
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
+        {!isPreview && (
+          <AutoSaveStatusIcon
+            autoSaveStatus={autoSaveStatus}
+            lastSavedAt={lastSavedAt}
+            hasUnsavedChanges={hasUnsavedChanges}
+          />
+        )}
         <Button
           aria-label={isPreview ? "Exit preview" : "Enter preview"}
           aria-pressed={isPreview}
