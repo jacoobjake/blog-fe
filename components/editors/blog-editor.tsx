@@ -27,7 +27,6 @@ import {
   useBlogAutoSave,
   useBlogEditorCrumbs,
   useBlogHeaderTitle,
-  useSessionKeepAlive,
 } from "@/hooks/editors";
 import { PublicBreadcrumbsList } from "@/components/nav/public/breadcrumbs";
 
@@ -172,8 +171,6 @@ function EditorContent({
   const user = useAuthStore((s) => s.user ?? undefined);
   const title = useBlogHeaderTitle();
   const [isEditorReady, setIsEditorReady] = useState(!blog);
-
-  useSessionKeepAlive();
 
   const {
     status: autoSaveStatus,
