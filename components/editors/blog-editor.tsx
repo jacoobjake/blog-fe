@@ -246,7 +246,7 @@ function EditorContent({
 
       <div className="flex flex-1 overflow-hidden">
         {!isPreview && <LeftBar />}
-        <div className="flex flex-1 overflow-y-auto page-container w-full max-w-5xl mx-auto p-6">
+        <div className="flex-1 overflow-y-auto page-container w-full max-w-5xl mx-auto p-6">
           <BlogEditorBreadcrumbs slug={blog?.slug} title={title} />
           <Frame data={blog ? deserializeBlogContent(blog) : undefined}>
             <RootCanvas user={user} />
