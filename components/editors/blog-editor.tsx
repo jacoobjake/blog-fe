@@ -14,15 +14,20 @@ import {
   TwoColumnElement,
 } from "./elements";
 import { Topbar } from "./toolbars/topbar";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createBlogAction, updateBlogAction } from "@/lib/actions";
 import lz from "lz-string";
+import { createBlogAction, updateBlogAction } from "@/lib/actions";
+import { buildBlogPayload } from "@/lib/editors/build-blog-payload";
 import RightBar from "./toolbars/right-bar";
 import LeftBar from "./toolbars/left-bar";
 import { RenderNode } from "./render-node";
 import { useAuthStore } from "@/hooks/auth";
-import { useBlogEditorCrumbs, useBlogHeaderTitle } from "@/hooks/editors";
+import {
+  useBlogAutoSave,
+  useBlogEditorCrumbs,
+  useBlogHeaderTitle,
+} from "@/hooks/editors";
 import { PublicBreadcrumbsList } from "@/components/nav/public/breadcrumbs";
 
 type BlogEditorProps = {
@@ -38,15 +43,15 @@ function deserializeBlogContent(blog: Blog) {
     case BlogContentType.CompressedBase64:
       return lz.decompressFromBase64(body);
     default:
-      // Fallback: use as-is
       return typeof body === "string" ? body : JSON.stringify(body);
   }
-};
+}
 
 export default function BlogEditor({ blog }: BlogEditorProps) {
   const router = useRouter();
   const [isPreview, setIsPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const scheduleSaveRef = useRef<() => void>(() => {});
 
   const handlePreview = () => {
     setIsPreview(!isPreview);
@@ -54,57 +59,22 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
 
   const handleFinish = async (
     query: ReturnType<typeof useEditor>["query"],
-    actions: ReturnType<typeof useEditor>["actions"],
   ) => {
     setIsSaving(true);
     try {
-      // Get the serialized editor state
-      const json = query.serialize();
-
-      // Get blog header data
-      const nodes = query.getNodes();
-      const blogHeaderNode = Object.values(nodes).find(
-        (node) => node.data.name === "BlogHeaderElement",
-      );
-
-      const title = blogHeaderNode?.data.props.title || "";
-      const description = blogHeaderNode?.data.props.description || "";
-      const author = blogHeaderNode?.data.props.author || "";
-      const tags = blogHeaderNode?.data.props.tags || [];
-      const is_published = blogHeaderNode?.data.props.is_published || false;
-      const hero_asset_uuid =
-        blogHeaderNode?.data.props.hero_asset_uuid || null;
-
-      // Compress the JSON content
-      const compressed = lz.compressToBase64(json);
-
-      const payload = {
-        title: title.trim(),
-        description: description.trim() || null,
-        author: author.trim(),
-        json_content: {
-          type: BlogContentType.CompressedBase64,
-          body: compressed,
-        },
-        hero_asset_uuid,
-        is_published: is_published,
-        tags: tags.filter((tag: string) => tag.trim() !== ""),
-      };
-
-      if (blog?.slug) {
-        // Update existing blog
-        await updateBlogAction(blog.slug, payload);
-      } else {
-        // Create new blog
-        const response = await createBlogAction(payload);
-
-        // Redirect to the newly created blog editor
-        router.push(`/admin/editor/blogs?slug=${response.slug}`);
+      const payload = buildBlogPayload(query);
+      if (!payload) {
+        alert("Title and author are required before saving.");
         return;
       }
 
-      // // Navigate back to blog list
-      // router.push("/admin/blogs");
+      if (blog?.slug) {
+        await updateBlogAction(blog.slug, payload);
+      } else {
+        const response = await createBlogAction(payload);
+        router.push(`/admin/editor/blogs?slug=${response.slug}`);
+        return;
+      }
     } catch (error) {
       console.error("Failed to save blog:", error);
       alert("Failed to save blog. Please try again.");
@@ -113,16 +83,23 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
     }
   };
 
-  return <div className="w-full h-screen flex flex-col bg-background overflow-hidden">
-    <EditorContainer enabled={!isPreview} >
-      <EditorContent
-        blog={blog}
-        isPreview={isPreview}
-        isSaving={isSaving}
-        onPreview={handlePreview}
-        onFinish={handleFinish} />
-    </EditorContainer>
-  </div>;
+  return (
+    <div className="w-full h-screen flex flex-col bg-background overflow-hidden">
+      <EditorContainer
+        enabled={!isPreview}
+        onNodesChange={() => scheduleSaveRef.current()}
+      >
+        <EditorContent
+          blog={blog}
+          isPreview={isPreview}
+          isSaving={isSaving}
+          onPreview={handlePreview}
+          onFinish={handleFinish}
+          scheduleSaveRef={scheduleSaveRef}
+        />
+      </EditorContainer>
+    </div>
+  );
 }
 
 export function BlogContentViewer({ blog }: { blog: Blog }) {
@@ -133,23 +110,34 @@ export function BlogContentViewer({ blog }: { blog: Blog }) {
   );
 }
 
-function EditorContainer({ enabled, children }: { enabled: boolean, children: ReactNode }) {
-  return <Editor
-    resolver={{
-      TextElement,
-      ContainerElement,
-      ButtonElement,
-      BlogHeaderElement,
-      RootCanvas,
-      SpacerElement,
-      ImageElement,
-      TwoColumnElement,
-    }}
-    enabled={enabled}
-    onRender={RenderNode}
-  >
-    {children}
-  </Editor>
+function EditorContainer({
+  enabled,
+  onNodesChange,
+  children,
+}: {
+  enabled: boolean;
+  onNodesChange?: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Editor
+      resolver={{
+        TextElement,
+        ContainerElement,
+        ButtonElement,
+        BlogHeaderElement,
+        RootCanvas,
+        SpacerElement,
+        ImageElement,
+        TwoColumnElement,
+      }}
+      enabled={enabled}
+      onRender={RenderNode}
+      onNodesChange={onNodesChange}
+    >
+      {children}
+    </Editor>
+  );
 }
 
 function BlogEditorBreadcrumbs({
@@ -170,16 +158,36 @@ function EditorContent({
   isSaving,
   onPreview,
   onFinish,
+  scheduleSaveRef,
 }: {
   blog?: Blog;
   isPreview: boolean;
   isSaving: boolean;
   onPreview: () => void;
-  onFinish: (query: any, actions: any) => Promise<void>;
+  onFinish: (query: ReturnType<typeof useEditor>["query"]) => Promise<void>;
+  scheduleSaveRef: React.MutableRefObject<() => void>;
 }) {
   const { query, actions } = useEditor();
   const user = useAuthStore((s) => s.user ?? undefined);
   const title = useBlogHeaderTitle();
+  const [isEditorReady, setIsEditorReady] = useState(!blog);
+
+  const {
+    status: autoSaveStatus,
+    lastSavedAt,
+    hasUnsavedChanges,
+    scheduleSave,
+    markSaved,
+  } = useBlogAutoSave({
+    blog,
+    query,
+    enabled: !isPreview,
+    isReady: isEditorReady,
+  });
+
+  useEffect(() => {
+    scheduleSaveRef.current = scheduleSave;
+  }, [scheduleSave, scheduleSaveRef]);
 
   useEffect(() => {
     if (!blog) return;
@@ -208,34 +216,39 @@ function EditorContent({
         props.hero_object_position = props.hero_object_position ?? "50% 50%";
       }
     });
+
+    const timer = window.setTimeout(() => {
+      setIsEditorReady(true);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [actions, blog, query]);
 
-  const handleFinishClick = () => {
-    onFinish(query, actions);
+  const handleFinishClick = async () => {
+    await onFinish(query);
+    markSaved();
   };
 
   return (
     <>
-      {/* Toolbar outside canvas */}
       <Topbar
         isPreview={isPreview}
         onPreview={onPreview}
         onFinish={handleFinishClick}
         isSaving={isSaving}
+        autoSaveStatus={autoSaveStatus}
+        lastSavedAt={lastSavedAt}
+        hasUnsavedChanges={hasUnsavedChanges}
       />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar with toolbox */}
         {!isPreview && <LeftBar />}
-        {/* Main editor area */}
         <div className="flex-1 overflow-y-auto page-container w-full max-w-5xl mx-auto p-6">
           <BlogEditorBreadcrumbs slug={blog?.slug} title={title} />
           <Frame data={blog ? deserializeBlogContent(blog) : undefined}>
             <RootCanvas user={user} />
           </Frame>
         </div>
-
-        {/* Right sidebar with layer and settings */}
         {!isPreview && <RightBar />}
       </div>
     </>

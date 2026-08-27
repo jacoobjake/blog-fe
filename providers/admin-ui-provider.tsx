@@ -2,6 +2,7 @@
 
 import { AdminNavContextProvider } from "./admin-nav-provider";
 import { AuthContextProvider } from "./auth-provider";
+import { SessionKeepAlive } from "./session-keep-alive";
 import { AdminNavState, AuthState, ThemeState } from "@/stores/types";
 import { ThemeContextProvider } from "./theme-provider";
 import {
@@ -46,6 +47,7 @@ export default function AdminUiProvider({
   return (
     <QueryClientProvider client={queryClient}>
       <AuthContextProvider initialState={initialAuthState}>
+        <SessionKeepAlive />
         <ThemeContextProvider initialState={initialThemeState}>
           <AdminNavContextProvider initialState={initialNavState}>
             {children}
