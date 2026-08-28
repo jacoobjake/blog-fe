@@ -1,7 +1,6 @@
 import BlogEditor from "@/components/editors/blog-editor";
 import { getServerApi } from "@/lib/apis/server";
-import { canManageOwnAuthorProfile } from "@/lib/utils/author-permissions";
-import { getErrorStatus } from "@/lib/utils/api-error";
+import { getCurrentUserAuthorProfile } from "@/lib/utils/default-author-profile";
 
 export default async function BlogEditorPage({
   searchParams,
@@ -15,18 +14,10 @@ export default async function BlogEditorPage({
 
   if (slug) {
     blog = await api.blogs.getBlog(slug);
-  } else {
-    const user = await api.auth.me();
+  }
 
-    if (canManageOwnAuthorProfile(user)) {
-      try {
-        defaultAuthorProfile = await api.authors.getMyAuthorProfile();
-      } catch (error) {
-        if (getErrorStatus(error) !== 404) {
-          throw error;
-        }
-      }
-    }
+  if (!blog?.author_profile) {
+    defaultAuthorProfile = await getCurrentUserAuthorProfile(api);
   }
 
   return (

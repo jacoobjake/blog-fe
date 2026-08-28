@@ -12,10 +12,12 @@ import { BLOG_DETAILS_FORM_ID } from "./blog-details-toolbar";
 
 type BlogDetailsPageContentProps = {
   blog: Blog;
+  defaultAuthorProfileId?: number;
 };
 
 export default function BlogDetailsPageContent({
   blog,
+  defaultAuthorProfileId,
 }: BlogDetailsPageContentProps) {
   const router = useRouter();
   const { user } = useAuth();
@@ -42,6 +44,7 @@ export default function BlogDetailsPageContent({
       </div>
       <BlogDetailsForm
         blog={blog}
+        defaultAuthorProfileId={defaultAuthorProfileId}
         formId={BLOG_DETAILS_FORM_ID}
         onSubmit={handleSubmit}
         readOnly={!canManage}

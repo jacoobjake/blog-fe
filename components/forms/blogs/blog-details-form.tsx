@@ -18,6 +18,7 @@ import TagsField from "../fields/tags-field";
 
 type BlogDetailsFormProps = {
   blog: Blog;
+  defaultAuthorProfileId?: number;
   formId?: string;
   onSubmit: (data: UpdateBlogMetadataDto) => Promise<void>;
   readOnly?: boolean;
@@ -25,6 +26,7 @@ type BlogDetailsFormProps = {
 
 export default function BlogDetailsForm({
   blog,
+  defaultAuthorProfileId,
   formId = "blog-details-form",
   onSubmit,
   readOnly = false,
@@ -39,7 +41,7 @@ export default function BlogDetailsForm({
       title: blog.title,
       author_profile_id: blog.author_profile
         ? Number(blog.author_profile.id)
-        : undefined,
+        : defaultAuthorProfileId,
       description: blog.description ?? "",
       tags: blog.tags.map((t) => t.name || ""),
     },

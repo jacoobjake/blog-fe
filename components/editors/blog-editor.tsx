@@ -220,9 +220,13 @@ function EditorContent({
         props.author_profile_id = Number(blog.author_profile.id);
         props.author_name = blog.author_profile.name;
         props.author_bio = blog.author_profile.bio ?? "";
+      } else if (defaultAuthorProfile) {
+        props.author_profile_id = Number(defaultAuthorProfile.id);
+        props.author_name = defaultAuthorProfile.name;
+        props.author_bio = defaultAuthorProfile.bio ?? "";
       }
     });
-  }, [actions, blog, query]);
+  }, [actions, blog, defaultAuthorProfile, query]);
 
   const handleFinishClick = () => {
     onFinish(query, actions);
