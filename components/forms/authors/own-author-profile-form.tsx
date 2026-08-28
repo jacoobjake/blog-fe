@@ -7,13 +7,13 @@ import {
 import type { AuthorProfile } from "@/lib/types";
 import { formatError } from "@/lib/utils/api-error";
 import {
-  ErrorMessage,
   FieldError,
   Form,
   Input,
   Label,
   TextArea,
   TextField,
+  toast,
 } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
@@ -47,6 +47,7 @@ export default function OwnAuthorProfileForm({
       await onSubmit(data);
     } catch (error) {
       const formatted = formatError(error);
+      toast.danger(formatted.message);
       setError("root.serverError", {
         type: formatted.status.toString(),
         message: formatted.message,
@@ -92,9 +93,7 @@ export default function OwnAuthorProfileForm({
       />
 
       {errors.root?.serverError && (
-        <p>
-          <ErrorMessage>{errors.root.serverError.message}</ErrorMessage>
-        </p>
+        <p className="sr-only">{errors.root.serverError.message}</p>
       )}
     </Form>
   );

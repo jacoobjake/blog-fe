@@ -4,6 +4,7 @@ import { AdminNavContextProvider } from "./admin-nav-provider";
 import { AuthContextProvider } from "./auth-provider";
 import { AdminNavState, AuthState, ThemeState } from "@/stores/types";
 import { ThemeContextProvider } from "./theme-provider";
+import { AppToastProvider } from "./app-toast-provider";
 import {
   isServer,
   QueryClient,
@@ -49,6 +50,7 @@ export default function AdminUiProvider({
         <ThemeContextProvider initialState={initialThemeState}>
           <AdminNavContextProvider initialState={initialNavState}>
             {children}
+            <AppToastProvider />
           </AdminNavContextProvider>
         </ThemeContextProvider>
       </AuthContextProvider>

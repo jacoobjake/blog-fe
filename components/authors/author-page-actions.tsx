@@ -1,7 +1,8 @@
 "use client";
 
 import { deleteAuthorAction } from "@/lib/actions/authors";
-import { Button, type ButtonProps } from "@heroui/react";
+import { formatError } from "@/lib/utils/api-error";
+import { Button, toast, type ButtonProps } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -43,8 +44,11 @@ export function DeleteAuthorButton({
     setIsDeleting(true);
     try {
       await deleteAuthorAction(authorId);
+      toast.success("Author profile deleted.");
       router.push("/admin/authors");
       router.refresh();
+    } catch (error) {
+      toast.danger(formatError(error).message);
     } finally {
       setIsDeleting(false);
     }
@@ -52,10 +56,9 @@ export function DeleteAuthorButton({
 
   return (
     <Button
-      variant="outline"
+      variant="danger"
       onPress={handleDelete}
       isPending={isDeleting}
-      className="text-danger border-danger"
       {...props}
     >
       Delete author profile

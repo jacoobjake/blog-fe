@@ -7,8 +7,8 @@ import type {
   UpdateAuthorProfileDto,
 } from "@/lib/schemas/author-profile";
 import type { AuthorProfile } from "@/lib/types";
+import { toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 type EditAuthorPageContentProps = {
   author: AuthorProfile;
@@ -20,32 +20,20 @@ export default function EditAuthorPageContent({
   formId,
 }: EditAuthorPageContentProps) {
   const router = useRouter();
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (
     data: CreateAuthorProfileDto | UpdateAuthorProfileDto,
   ) => {
-    const payload = { ...data };
-
-    if (payload.user?.link === "none") {
-      delete payload.user;
-    }
-
-    await updateAuthorAction(author.id, payload);
-    setSuccessMessage("Author profile updated successfully.");
+    await updateAuthorAction(author.id, data);
+    toast.success("Author profile updated successfully.");
     router.refresh();
   };
 
   return (
-    <div className="space-y-4">
-      {successMessage && (
-        <p className="text-sm text-success">{successMessage}</p>
-      )}
-      <AuthorProfileForm
-        author={author}
-        formId={formId}
-        onSubmit={handleSubmit}
-      />
-    </div>
+    <AuthorProfileForm
+      author={author}
+      formId={formId}
+      onSubmit={handleSubmit}
+    />
   );
 }

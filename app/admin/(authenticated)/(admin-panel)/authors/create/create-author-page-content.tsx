@@ -6,6 +6,7 @@ import type {
   CreateAuthorProfileDto,
   UpdateAuthorProfileDto,
 } from "@/lib/schemas/author-profile";
+import { toast } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 type CreateAuthorPageContentProps = {
@@ -31,6 +32,7 @@ export default function CreateAuthorPageContent({
     }
 
     const author = await createAuthorAction(payload);
+    toast.success("Author profile created successfully.");
     router.push(`/admin/authors/${author.id}`);
   };
 

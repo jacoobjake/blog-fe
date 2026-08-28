@@ -9,7 +9,6 @@ import {
 import type { AuthorProfile } from "@/lib/types";
 import { formatError } from "@/lib/utils/api-error";
 import {
-  ErrorMessage,
   FieldError,
   Form,
   Input,
@@ -19,6 +18,7 @@ import {
   Surface,
   TextArea,
   TextField,
+  toast,
 } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -72,9 +72,11 @@ export default function AuthorProfileForm({
     defaultValues: {
       name: author?.name ?? "",
       bio: author?.bio ?? "",
-      user: author?.user
-        ? { link: "existing" as const, user_id: Number(author.user.id) }
-        : { link: defaultLink },
+      ...(allowUserLinking && !author?.user
+        ? {
+            user: { link: defaultLink },
+          }
+        : {}),
     },
     resolver: zodResolver(schema),
   });
@@ -115,9 +117,18 @@ export default function AuthorProfileForm({
     data: CreateAuthorProfileDto | UpdateAuthorProfileDto,
   ) => {
     try {
-      await onSubmit(data);
+      const payload = { ...data };
+
+      if (isEditingLinkedProfile) {
+        delete payload.user;
+      } else if (payload.user?.link === "none") {
+        delete payload.user;
+      }
+
+      await onSubmit(payload);
     } catch (error) {
       const formatted = formatError(error);
+      toast.danger(formatted.message);
       setError("root.serverError", {
         type: formatted.status.toString(),
         message: formatted.message,
@@ -300,9 +311,7 @@ export default function AuthorProfileForm({
       )}
 
       {errors.root?.serverError && (
-        <p>
-          <ErrorMessage>{errors.root.serverError.message}</ErrorMessage>
-        </p>
+        <p className="sr-only">{errors.root.serverError.message}</p>
       )}
     </Form>
   );
