@@ -15,7 +15,6 @@ import {
   Label,
   ListBox,
   Select,
-  Surface,
   TextArea,
   TextField,
   toast,
@@ -72,9 +71,14 @@ export default function AuthorProfileForm({
     defaultValues: {
       name: author?.name ?? "",
       bio: author?.bio ?? "",
-      ...(allowUserLinking && !author?.user
+      ...(allowUserLinking
         ? {
-            user: { link: defaultLink },
+            user: author?.user
+              ? {
+                  link: "existing" as const,
+                  user_id: Number(author.user.id),
+                }
+              : { link: defaultLink },
           }
         : {}),
     },
@@ -82,7 +86,6 @@ export default function AuthorProfileForm({
   });
 
   const linkMode = useWatch({ control, name: "user.link" });
-  const isEditingLinkedProfile = Boolean(author?.user);
 
   useEffect(() => {
     if (!allowUserLinking || linkMode !== "existing") {
@@ -105,13 +108,22 @@ export default function AuthorProfileForm({
       .then((response) => setUsers(response.users.data));
   }, [allowUserLinking, linkMode]);
 
-  const userOptions = useMemo(
-    () =>
-      users.filter(
-        (user) => !author?.user || user.id !== author.user?.id,
-      ),
-    [users, author?.user],
-  );
+  const userOptions = useMemo(() => {
+    const options = [...users];
+
+    if (
+      author?.user &&
+      !options.some((user) => user.id === author.user?.id)
+    ) {
+      options.unshift({
+        id: author.user.id,
+        name: author.user.name,
+        email: author.user.email,
+      });
+    }
+
+    return options;
+  }, [users, author?.user]);
 
   const handleFormSubmit = async (
     data: CreateAuthorProfileDto | UpdateAuthorProfileDto,
@@ -119,9 +131,7 @@ export default function AuthorProfileForm({
     try {
       const payload = { ...data };
 
-      if (isEditingLinkedProfile) {
-        delete payload.user;
-      } else if (payload.user?.link === "none") {
+      if (payload.user?.link === "none" && !author?.user) {
         delete payload.user;
       }
 
@@ -173,7 +183,7 @@ export default function AuthorProfileForm({
         )}
       />
 
-      {allowUserLinking && !isEditingLinkedProfile && (
+      {allowUserLinking && (
         <Controller
           name="user.link"
           control={control}
@@ -229,7 +239,7 @@ export default function AuthorProfileForm({
         />
       )}
 
-      {allowUserLinking && !isEditingLinkedProfile && linkMode === "existing" && (
+      {allowUserLinking && linkMode === "existing" && (
         <Controller
           name="user.user_id"
           control={control}
@@ -264,7 +274,7 @@ export default function AuthorProfileForm({
         />
       )}
 
-      {allowUserLinking && !isEditingLinkedProfile && linkMode === "new" && (
+      {allowUserLinking && linkMode === "new" && (
         <>
           <Controller
             name="user.name"
@@ -301,15 +311,6 @@ export default function AuthorProfileForm({
           />
         </>
       )}
-
-      {author?.user && (
-        <Surface className="p-4 space-y-1">
-          <p className="font-medium">Linked user</p>
-          <p>{author.user.name}</p>
-          <p className="text-sm text-muted">{author.user.email}</p>
-        </Surface>
-      )}
-
       {errors.root?.serverError && (
         <p className="sr-only">{errors.root.serverError.message}</p>
       )}
