@@ -16,7 +16,7 @@ export type Blog = {
   } | null;
   hero_asset_uuid?: string | null;
   hero_asset?: Asset | null;
-  author_profile: AuthorProfile;
+  author_profile?: AuthorProfile | null;
   is_published: boolean;
   tags: { name: string }[];
   created_by?: UserSummary;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useAdminDashboardData } from "@/hooks/blogs";
+import { getBlogAuthorName } from "@/lib/utils/blog-author";
 import { dateToDatetimeString } from "@/lib/utils";
 import { Button, Card, Chip, Skeleton } from "@heroui/react";
 import Link from "next/link";
@@ -112,7 +113,7 @@ export default function AdminDashboardContent() {
                       {blog.title}
                     </Link>
                     <p className="text-sm text-muted">
-                      {blog.author_profile.name} · Updated{" "}
+                      {getBlogAuthorName(blog)} · Updated{" "}
                       {dateToDatetimeString(new Date(blog.updated_at))}
                     </p>
                   </div>

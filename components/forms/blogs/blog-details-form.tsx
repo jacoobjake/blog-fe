@@ -37,7 +37,9 @@ export default function BlogDetailsForm({
   } = useForm({
     defaultValues: {
       title: blog.title,
-      author_profile_id: Number(blog.author_profile.id),
+      author_profile_id: blog.author_profile
+        ? Number(blog.author_profile.id)
+        : undefined,
       description: blog.description ?? "",
       tags: blog.tags.map((t) => t.name || ""),
     },

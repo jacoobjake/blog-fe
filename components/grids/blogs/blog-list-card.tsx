@@ -1,4 +1,5 @@
 import { Blog } from "@/lib/types";
+import { getBlogAuthorName } from "@/lib/utils/blog-author";
 import { dateToDateString } from "@/lib/utils";
 import Link from "next/link";
 import { BlogCardThumbnail } from "./blog-card-thumbnail";
@@ -41,7 +42,7 @@ export default function BlogListCard({
             </div>
           </div>
           <div className="mt-4">
-            <p>{blog.author_profile.name}</p>
+            <p>{getBlogAuthorName(blog)}</p>
             <p className="text-black/30 text-xs dark:text-white/40">
               {dateToDateString(createdAt)}
             </p>

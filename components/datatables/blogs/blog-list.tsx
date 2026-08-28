@@ -13,6 +13,7 @@ import {
   type BlogListFilters,
 } from "@/lib/utils/blog-filters";
 import { dateToDatetimeString } from "@/lib/utils";
+import { getBlogAuthorName } from "@/lib/utils/blog-author";
 import {
   keepPreviousData,
   useQuery,
@@ -57,7 +58,7 @@ export default function BlogList() {
       },
       {
         id: "author_profile.name",
-        accessorFn: (row) => row.author_profile.name,
+        accessorFn: (row) => getBlogAuthorName(row),
         header: "Author",
         enableSorting: false,
       },
