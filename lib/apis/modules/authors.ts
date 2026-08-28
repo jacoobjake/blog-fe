@@ -5,6 +5,7 @@ import type {
   UpdateOwnAuthorProfileDto,
 } from "@/lib/schemas/author-profile";
 
+import { createApiError } from "../core/errors";
 import { createGraphqlClient } from "./graphql";
 import type { ApiFetcher } from "../core/types";
 import { createHttpMethods } from "../core/http";
@@ -24,7 +25,7 @@ const authorFields = `
 
 export function createAuthorApi(fetcher: ApiFetcher) {
   const gql = createGraphqlClient(fetcher);
-  const { get, post, put, del } = createHttpMethods(fetcher);
+  const { post, put, del } = createHttpMethods(fetcher);
 
   const authorProfilesQuery = `
     query AuthorProfiles($first: Int!, $page: Int!, $name: String, $orderBy: [QueryAuthorProfilesOrderByOrderByClause!]) {
@@ -44,14 +45,25 @@ export function createAuthorApi(fetcher: ApiFetcher) {
     }
   `;
 
-  return {
-    listAuthors: async () => {
-      const response = await get<{ data: { authors: AuthorProfile[] } }>(
-        AUTHORS_PATH,
-      );
-      return response.data.authors;
-    },
+  const authorProfileQuery = `
+    query AuthorProfile($id: ID!) {
+      authorProfile(id: $id) {
+        ${authorFields}
+      }
+    }
+  `;
 
+  const myAuthorProfileQuery = `
+    query MyAuthorProfile {
+      me {
+        author_profile {
+          ${authorFields}
+        }
+      }
+    }
+  `;
+
+  return {
     listAuthorProfiles: async (
       variables: {
         first?: number;
@@ -73,17 +85,26 @@ export function createAuthorApi(fetcher: ApiFetcher) {
     },
 
     getAuthor: async (id: string) => {
-      const response = await get<{ data: { author: AuthorProfile } }>(
-        `${AUTHORS_PATH}/${id}`,
+      const response = await gql.request<{ authorProfile: AuthorProfile }>(
+        authorProfileQuery,
+        { id },
       );
-      return response.data.author;
+
+      return response.authorProfile;
     },
 
     getMyAuthorProfile: async () => {
-      const response = await get<{ data: { author: AuthorProfile } }>(
-        `${AUTHORS_PATH}/me`,
-      );
-      return response.data.author;
+      const response = await gql.request<{
+        me: { author_profile: AuthorProfile | null };
+      }>(myAuthorProfileQuery);
+
+      const profile = response.me.author_profile;
+
+      if (!profile) {
+        throw createApiError("Author profile not found.", 404);
+      }
+
+      return profile;
     },
 
     createAuthor: async (data: CreateAuthorProfileDto) => {
