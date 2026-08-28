@@ -113,7 +113,9 @@ export default function AdminDashboardContent() {
                       {blog.title}
                     </Link>
                     <p className="text-sm text-muted">
-                      {getBlogAuthorName(blog)} · Updated{" "}
+                      {getBlogAuthorName(blog)
+                        ? `${getBlogAuthorName(blog)} · Updated `
+                        : "Updated "}
                       {dateToDatetimeString(new Date(blog.updated_at))}
                     </p>
                   </div>
