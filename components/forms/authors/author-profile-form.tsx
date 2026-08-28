@@ -109,20 +109,25 @@ export default function AuthorProfileForm({
   }, [allowUserLinking, linkMode]);
 
   const userOptions = useMemo(() => {
-    const options = [...users];
+    const byId = new Map<string, UserOption>();
 
-    if (
-      author?.user &&
-      !options.some((user) => user.id === author.user?.id)
-    ) {
-      options.unshift({
-        id: author.user.id,
-        name: author.user.name,
-        email: author.user.email,
-      });
+    for (const user of users) {
+      byId.set(String(user.id), { ...user, id: String(user.id) });
     }
 
-    return options;
+    if (author?.user) {
+      const linkedUserId = String(author.user.id);
+
+      if (!byId.has(linkedUserId)) {
+        byId.set(linkedUserId, {
+          id: linkedUserId,
+          name: author.user.name,
+          email: author.user.email ?? "",
+        });
+      }
+    }
+
+    return Array.from(byId.values());
   }, [users, author?.user]);
 
   const handleFormSubmit = async (
