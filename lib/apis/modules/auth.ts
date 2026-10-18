@@ -1,4 +1,4 @@
-import type { ChangePasswordDto, LoginDto } from "@/lib/schemas";
+import type { ChangePasswordDto, ForgotPasswordDto, LoginDto, ResetPasswordDto } from "@/lib/schemas";
 import type { User } from "@/lib/types";
 
 import { createGraphqlClient } from "./graphql";
@@ -20,6 +20,7 @@ export function createAuthApi(fetcher: ApiFetcher) {
         id
         email
         name
+        roles
       }
     }
   `;
@@ -49,6 +50,22 @@ export function createAuthApi(fetcher: ApiFetcher) {
       await fetcher({
         path: "api/admin/profile/password",
         method: "PUT",
+        body: dto,
+      });
+    },
+
+    forgotPassword: async (dto: ForgotPasswordDto): Promise<void> => {
+      await fetcher({
+        path: `${AUTH_PATH}/forgot-password`,
+        method: "POST",
+        body: dto,
+      });
+    },
+
+    resetPassword: async (dto: ResetPasswordDto): Promise<void> => {
+      await fetcher({
+        path: `${AUTH_PATH}/reset-password`,
+        method: "POST",
         body: dto,
       });
     },

@@ -14,6 +14,7 @@ import {
 } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatError } from "@/lib/utils/api-error";
 import { useAuth } from "@/hooks/auth";
@@ -99,6 +100,12 @@ export default function LoginForm({ className, ...props }: FormProps) {
       <Button type="submit" className={"w-full"} isPending={isSubmitting}>
         Login
       </Button>
+
+      <p className="text-center text-sm">
+        <Link href="/admin/forgot-password" className="text-accent hover:underline">
+          Forgot password?
+        </Link>
+      </p>
     </Form>
   );
 }

@@ -4,14 +4,17 @@ import { useNode, Element, UserComponent } from "@craftjs/core";
 import { BlogHeaderElement } from "../blog-header";
 import { TextElement } from "../text";
 import { ContainerElement } from "../container";
-import { User } from "@/lib/types";
+import type { AuthorProfile } from "@/lib/types";
 
 export type RootCanvasProps = {
-  user?: User
+  defaultAuthorProfile?: AuthorProfile | null;
   children?: React.ReactNode;
 };
 
-export const RootCanvas: UserComponent<RootCanvasProps> = ({ user, children }) => {
+export const RootCanvas: UserComponent<RootCanvasProps> = ({
+  defaultAuthorProfile,
+  children,
+}) => {
   const {
     connectors: { connect },
   } = useNode();
@@ -29,7 +32,11 @@ export const RootCanvas: UserComponent<RootCanvasProps> = ({ user, children }) =
         is={BlogHeaderElement}
         canvas={false}
         title="Untitled Blog Post"
-        author={user?.name || "Anonymous"}
+        author_profile_id={
+          defaultAuthorProfile ? Number(defaultAuthorProfile.id) : undefined
+        }
+        author_name={defaultAuthorProfile?.name || "Anonymous"}
+        author_bio={defaultAuthorProfile?.bio || ""}
         is_published={false}
         tags={[]}
         created_at=""

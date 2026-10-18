@@ -29,7 +29,9 @@ export function buildBlogPayload(
 
   const title = (blogHeaderNode.data.props.title as string) || "";
   const description = (blogHeaderNode.data.props.description as string) || "";
-  const author = (blogHeaderNode.data.props.author as string) || "";
+  const author_profile_id = blogHeaderNode.data.props.author_profile_id as
+    | number
+    | undefined;
   const tags = (blogHeaderNode.data.props.tags as string[]) || [];
   const hero_asset_uuid =
     (blogHeaderNode.data.props.hero_asset_uuid as string | null) || null;
@@ -39,14 +41,14 @@ export function buildBlogPayload(
     is_published = options.serverPublishState;
   }
 
-  if (!title.trim() || !author.trim()) return null;
+  if (!title.trim() || !author_profile_id) return null;
 
   const compressed = lz.compressToBase64(json);
 
   return {
     title: title.trim(),
     description: description.trim() || null,
-    author: author.trim(),
+    author_profile_id: Number(author_profile_id),
     json_content: {
       type: BlogContentType.CompressedBase64,
       body: compressed,

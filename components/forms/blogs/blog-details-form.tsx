@@ -1,5 +1,6 @@
 "use client";
 
+import AuthorProfileSelect from "@/components/forms/fields/author-profile-select";
 import { UpdateBlogMetadataDto, UpdateBlogMetadataSchema } from "@/lib/schemas/blog";
 import { Blog } from "@/lib/types";
 import { formatError } from "@/lib/utils/api-error";
@@ -17,14 +18,18 @@ import TagsField from "../fields/tags-field";
 
 type BlogDetailsFormProps = {
   blog: Blog;
+  defaultAuthorProfileId?: number;
   formId?: string;
   onSubmit: (data: UpdateBlogMetadataDto) => Promise<void>;
+  readOnly?: boolean;
 };
 
 export default function BlogDetailsForm({
   blog,
+  defaultAuthorProfileId,
   formId = "blog-details-form",
   onSubmit,
+  readOnly = false,
 }: BlogDetailsFormProps) {
   const {
     control,
@@ -34,7 +39,9 @@ export default function BlogDetailsForm({
   } = useForm({
     defaultValues: {
       title: blog.title,
-      author: blog.author,
+      author_profile_id: blog.author_profile
+        ? Number(blog.author_profile.id)
+        : defaultAuthorProfileId,
       description: blog.description ?? "",
       tags: blog.tags.map((t) => t.name || ""),
     },
@@ -71,24 +78,27 @@ export default function BlogDetailsForm({
             type="text"
           >
             <Label>Title</Label>
-            <Input {...field} />
+            <Input {...field} disabled={readOnly} />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}
       />
       <Controller
-        name="author"
+        name="author_profile_id"
         control={control}
         render={({ field, fieldState }) => (
-          <TextField
+          <AuthorProfileSelect
+            value={
+              typeof field.value === "number" ? field.value : null
+            }
+            onChange={(profile) =>
+              field.onChange(profile ? Number(profile.id) : undefined)
+            }
+            onBlur={field.onBlur}
             isInvalid={fieldState.invalid}
-            aria-label="Author"
-            type="text"
-          >
-            <Label>Author</Label>
-            <Input {...field} />
-            <FieldError>{fieldState.error?.message}</FieldError>
-          </TextField>
+            errorMessage={fieldState.error?.message}
+            isDisabled={readOnly}
+          />
         )}
       />
       <Controller
@@ -101,7 +111,7 @@ export default function BlogDetailsForm({
             type="text"
           >
             <Label>Description</Label>
-            <Input {...field} value={field.value ?? ""} />
+            <Input {...field} value={field.value ?? ""} disabled={readOnly} />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}

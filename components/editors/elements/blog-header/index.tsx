@@ -12,7 +12,8 @@ export type { BlogHeaderElementProps } from "./types";
 const defaultProps: Partial<BlogHeaderElementProps> = {
   title: "Untitled Blog Post",
   description: "",
-  author: "Anonymous",
+  author_name: "Anonymous",
+  author_bio: "",
   tags: [],
   created_at: "",
   hero_object_position: "50% 50%",
@@ -21,13 +22,19 @@ const defaultProps: Partial<BlogHeaderElementProps> = {
 export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
   title,
   description,
-  author,
+  author_name: authorNameProp,
+  author_bio,
   is_published,
   tags = [],
   created_at,
   hero_src,
   hero_object_position = "50% 50%",
+  ...legacyProps
 }) => {
+  const author_name =
+    authorNameProp ||
+    (legacyProps as { author?: string }).author ||
+    "Anonymous";
   const {
     connectors: { connect },
     actions: { setProp },
@@ -72,8 +79,11 @@ export const BlogHeaderElement: UserComponent<BlogHeaderElementProps> = ({
       </div>
       {description && <p className="text-lg text-muted mb-4">{description}</p>}
       <div className="flex items-center gap-4 text-sm text-muted mb-2">
-        <span>By {author}</span>
+        <span>By {author_name}</span>
       </div>
+      {author_bio && (
+        <p className="text-sm text-muted mb-2">{author_bio}</p>
+      )}
       {created_at && (
         <div className="flex items-center gap-4 text-xs text-muted/70 mb-2">
           <ClientDateTime date={created_at} />

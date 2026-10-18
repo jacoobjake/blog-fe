@@ -28,3 +28,23 @@ export const ChangePasswordSchema = z
   });
 
 export type ChangePasswordDto = z.infer<typeof ChangePasswordSchema>;
+
+export const ForgotPasswordSchema = z.object({
+  email: z.email(),
+});
+
+export type ForgotPasswordDto = z.infer<typeof ForgotPasswordSchema>;
+
+export const ResetPasswordSchema = z
+  .object({
+    email: z.email(),
+    token: z.string().min(1, "Reset token is required"),
+    password: passwordSchema,
+    password_confirmation: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "Passwords do not match",
+    path: ["password_confirmation"],
+  });
+
+export type ResetPasswordDto = z.infer<typeof ResetPasswordSchema>;

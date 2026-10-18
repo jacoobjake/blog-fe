@@ -1,6 +1,7 @@
 "use client";
 
 import { Blog, BlogContentType } from "@/lib/types";
+import type { AuthorProfile } from "@/lib/types";
 import type { BlogHeaderElementProps } from "./elements/blog-header/types";
 import { Editor, Frame, useEditor } from "@craftjs/core";
 import {
@@ -22,7 +23,6 @@ import { buildBlogPayload } from "@/lib/editors/build-blog-payload";
 import RightBar from "./toolbars/right-bar";
 import LeftBar from "./toolbars/left-bar";
 import { RenderNode } from "./render-node";
-import { useAuthStore } from "@/hooks/auth";
 import {
   useBlogAutoSave,
   useBlogEditorCrumbs,
@@ -32,6 +32,7 @@ import { PublicBreadcrumbsList } from "@/components/nav/public/breadcrumbs";
 
 type BlogEditorProps = {
   blog?: Blog;
+  defaultAuthorProfile?: AuthorProfile | null;
 };
 
 function deserializeBlogContent(blog: Blog) {
@@ -47,7 +48,7 @@ function deserializeBlogContent(blog: Blog) {
   }
 }
 
-export default function BlogEditor({ blog }: BlogEditorProps) {
+export default function BlogEditor({ blog, defaultAuthorProfile }: BlogEditorProps) {
   const router = useRouter();
   const [isPreview, setIsPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -64,7 +65,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
     try {
       const payload = buildBlogPayload(query);
       if (!payload) {
-        alert("Title and author are required before saving.");
+        alert("Title and author profile are required before saving.");
         return;
       }
 
@@ -91,6 +92,7 @@ export default function BlogEditor({ blog }: BlogEditorProps) {
       >
         <EditorContent
           blog={blog}
+          defaultAuthorProfile={defaultAuthorProfile}
           isPreview={isPreview}
           isSaving={isSaving}
           onPreview={handlePreview}
@@ -154,6 +156,7 @@ function BlogEditorBreadcrumbs({
 
 function EditorContent({
   blog,
+  defaultAuthorProfile,
   isPreview,
   isSaving,
   onPreview,
@@ -161,6 +164,7 @@ function EditorContent({
   scheduleSaveRef,
 }: {
   blog?: Blog;
+  defaultAuthorProfile?: AuthorProfile | null;
   isPreview: boolean;
   isSaving: boolean;
   onPreview: () => void;
@@ -168,7 +172,6 @@ function EditorContent({
   scheduleSaveRef: React.MutableRefObject<() => void>;
 }) {
   const { query, actions } = useEditor();
-  const user = useAuthStore((s) => s.user ?? undefined);
   const title = useBlogHeaderTitle();
   const [isEditorReady, setIsEditorReady] = useState(!blog);
 
@@ -215,6 +218,16 @@ function EditorContent({
         props.hero_src = blog.hero_asset.media.url;
         props.hero_object_position = props.hero_object_position ?? "50% 50%";
       }
+
+      if (blog.author_profile) {
+        props.author_profile_id = Number(blog.author_profile.id);
+        props.author_name = blog.author_profile.name;
+        props.author_bio = blog.author_profile.bio ?? "";
+      } else if (defaultAuthorProfile) {
+        props.author_profile_id = Number(defaultAuthorProfile.id);
+        props.author_name = defaultAuthorProfile.name;
+        props.author_bio = defaultAuthorProfile.bio ?? "";
+      }
     });
 
     const timer = window.setTimeout(() => {
@@ -222,7 +235,7 @@ function EditorContent({
     }, 0);
 
     return () => window.clearTimeout(timer);
-  }, [actions, blog, query]);
+  }, [actions, blog, defaultAuthorProfile, query]);
 
   const handleFinishClick = async () => {
     await onFinish(query);
@@ -246,7 +259,7 @@ function EditorContent({
         <div className="flex-1 overflow-y-auto page-container w-full max-w-5xl mx-auto p-6">
           <BlogEditorBreadcrumbs slug={blog?.slug} title={title} />
           <Frame data={blog ? deserializeBlogContent(blog) : undefined}>
-            <RootCanvas user={user} />
+            <RootCanvas defaultAuthorProfile={defaultAuthorProfile} />
           </Frame>
         </div>
         {!isPreview && <RightBar />}

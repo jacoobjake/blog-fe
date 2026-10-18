@@ -4,13 +4,16 @@ import BlogFilters from "@/components/blogs/blog-filters";
 import DeleteBlogButton from "@/components/blogs/delete-blog-button";
 import OpenEditorButton from "@/components/editors/open-editor-btn";
 import { useBlogTags } from "@/hooks/blogs";
+import { useAuth } from "@/hooks/auth";
 import { blogApi } from "@/lib/apis";
 import { Blog } from "@/lib/types";
+import { canManageBlog } from "@/lib/utils/blog-permissions";
 import {
   sortingStateToOrderBy,
   type BlogListFilters,
 } from "@/lib/utils/blog-filters";
 import { dateToDatetimeString } from "@/lib/utils";
+import { getBlogAuthorName } from "@/lib/utils/blog-author";
 import {
   keepPreviousData,
   useQuery,
@@ -31,6 +34,7 @@ import { toSortingState } from "../layouts/utils";
 
 export default function BlogList() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const { data: tagOptions = [] } = useBlogTags();
   const [filters, setFilters] = useState<BlogListFilters>({});
   const [sorting, setSorting] = useState<SortingState>([
@@ -53,9 +57,10 @@ export default function BlogList() {
         ),
       },
       {
-        accessorKey: "author",
+        id: "author_profile.name",
+        accessorFn: (row) => getBlogAuthorName(row),
         header: "Author",
-        enableSorting: true,
+        enableSorting: false,
       },
       {
         accessorKey: "tags",
@@ -111,19 +116,23 @@ export default function BlogList() {
         id: "actions",
         cell: (info) => {
           const row = info.row;
+          const canManage = canManageBlog(user, row.original);
+
           return (
             <div className="flex items-center justify-end gap-2">
               <OpenEditorButton variant="ghost" slug={row.original.slug} />
-              <DeleteBlogButton
-                slug={row.original.slug}
-                title={row.original.title}
-              />
+              {canManage && (
+                <DeleteBlogButton
+                  slug={row.original.slug}
+                  title={row.original.title}
+                />
+              )}
             </div>
           );
         },
       },
     ],
-    [],
+    [user],
   );
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,

@@ -27,6 +27,14 @@ type BlogListQueryVariables = {
  *
  * Callers can pass either a browser fetcher or a server fetcher.
  */
+const authorProfileFields = `
+  author_profile {
+    id
+    name
+    bio
+  }
+`;
+
 const heroAssetFields = `
   hero_asset {
     uuid
@@ -52,9 +60,17 @@ export function createBlogApi(fetcher: ApiFetcher) {
                 slug
                 title
                 description
-                author
+                ${authorProfileFields}
                 is_published
                 tags {
+                    name
+                }
+                created_by {
+                    id
+                    name
+                }
+                updated_by {
+                    id
                     name
                 }
                 ${heroAssetFields}
@@ -82,7 +98,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
           slug
           title
           description
-          author
+          ${authorProfileFields}
           tags {
             name
           }
@@ -130,11 +146,19 @@ export function createBlogApi(fetcher: ApiFetcher) {
         slug
         title
         description
-        author
+        ${authorProfileFields}
         json_content
         is_published
         ${heroAssetFields}
         tags {
+          name
+        }
+        created_by {
+          id
+          name
+        }
+        updated_by {
+          id
           name
         }
         created_at
@@ -149,7 +173,7 @@ export function createBlogApi(fetcher: ApiFetcher) {
         slug
         title
         description
-        author
+        ${authorProfileFields}
         json_content
         is_published
         ${heroAssetFields}
