@@ -63,25 +63,8 @@ export function usePublicBlogTags() {
 export function useAdminDashboardData() {
   return useQuery({
     queryKey: blogQueryKeys.dashboard,
-    queryFn: async () => {
-      const [all, published, drafts, recent] = await Promise.all([
-        blogApi.listBlogs({ first: 1, page: 1 }),
-        blogApi.listBlogs({ first: 1, page: 1, is_published: true }),
-        blogApi.listBlogs({ first: 1, page: 1, is_published: false }),
-        blogApi.listBlogs({
-          first: 5,
-          page: 1,
-          orderBy: [{ column: "updated_at", order: "DESC" }],
-        }),
-      ]);
-
-      return {
-        total: all.paginatorInfo.total,
-        published: published.paginatorInfo.total,
-        drafts: drafts.paginatorInfo.total,
-        recent: recent.data,
-      };
-    },
+    queryFn: () => blogApi.getAdminDashboard(),
     placeholderData: keepPreviousData,
+    retry: 1,
   });
 }
