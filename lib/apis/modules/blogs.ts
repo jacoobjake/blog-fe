@@ -1,4 +1,16 @@
 import type { Blog, GraphqlResponseWithPaginatorInfo } from "@/lib/types";
+
+export type AdminDashboardBlog = Pick<
+  Blog,
+  "slug" | "title" | "is_published" | "updated_at" | "author_profile"
+>;
+
+export type AdminDashboard = {
+  total: number;
+  published: number;
+  drafts: number;
+  recent: AdminDashboardBlog[];
+};
 import type { CreateBlogDto, UpdateBlogDto } from "@/lib/schemas";
 import type {
   BlogListFilters,
@@ -204,6 +216,29 @@ export function createBlogApi(fetcher: ApiFetcher) {
     }
   `;
 
+  const adminDashboardQuery = `
+    query AdminDashboard($orderBy: [QueryBlogsOrderByOrderByClause!]) {
+      total: blogs(first: 0, page: 1) {
+        paginatorInfo { total }
+      }
+      published: blogs(first: 0, page: 1, is_published: true) {
+        paginatorInfo { total }
+      }
+      drafts: blogs(first: 0, page: 1, is_published: false) {
+        paginatorInfo { total }
+      }
+      recent: blogs(first: 5, page: 1, orderBy: $orderBy) {
+        data {
+          slug
+          title
+          is_published
+          updated_at
+          author_profile { name }
+        }
+      }
+    }
+  `;
+
   const buildListVariables = (variables: BlogListQueryVariables) => ({
     first: variables.first,
     page: variables.page,
@@ -291,6 +326,23 @@ export function createBlogApi(fetcher: ApiFetcher) {
       }
 
       return blog;
+    },
+    getAdminDashboard: async (): Promise<AdminDashboard> => {
+      const response = await gql.request<{
+        total: { paginatorInfo: { total: number } };
+        published: { paginatorInfo: { total: number } };
+        drafts: { paginatorInfo: { total: number } };
+        recent: { data: AdminDashboardBlog[] };
+      }>(adminDashboardQuery, {
+        orderBy: orderByToGraphql([{ column: "updated_at", order: "DESC" }]),
+      });
+
+      return {
+        total: response.total.paginatorInfo.total,
+        published: response.published.paginatorInfo.total,
+        drafts: response.drafts.paginatorInfo.total,
+        recent: response.recent.data,
+      };
     },
     listBlogTags: async () => {
       const response = await gql.request<{
