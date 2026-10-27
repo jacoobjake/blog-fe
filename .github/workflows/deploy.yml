@@ -1,0 +1,74 @@
+# Deploy blog-fe to Cloudflare Workers on merge to main.
+#
+# Required GitHub Actions configuration
+# (Settings → Secrets and variables → Actions):
+#
+# Secrets
+#   CLOUDFLARE_API_TOKEN    Edit Cloudflare Workers token
+#   CLOUDFLARE_ACCOUNT_ID   Cloudflare account ID
+#
+# Variables
+#   NEXT_PUBLIC_API_BASE_URL   Production API origin, no trailing slash
+#   NEXT_PUBLIC_APP_NAME       Optional site title
+#   NEXT_PUBLIC_APP_URL        Optional frontend origin (https://jgandj.com)
+#   NEXT_PUBLIC_GRAPHQL_PATH   Optional, defaults to /graphql in app code
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cloudflare-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Check required configuration
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+        run: |
+          missing=0
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "Missing secret CLOUDFLARE_API_TOKEN"
+            missing=1
+          fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Missing secret CLOUDFLARE_ACCOUNT_ID"
+            missing=1
+          fi
+          if [ -z "$NEXT_PUBLIC_API_BASE_URL" ]; then
+            echo "Missing variable NEXT_PUBLIC_API_BASE_URL"
+            missing=1
+          fi
+          exit "$missing"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and deploy
+        run: npm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_APP_NAME: ${{ vars.NEXT_PUBLIC_APP_NAME }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_GRAPHQL_PATH: ${{ vars.NEXT_PUBLIC_GRAPHQL_PATH }}
